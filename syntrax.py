@@ -11,6 +11,7 @@ import sys
 import ast
 import os
 import io
+import copy
 import subprocess
 
 import cairo
@@ -78,13 +79,16 @@ class DrawStyle(object):
   def __init__(self, styles=None):
     # Set defaults
     self.line_width = 2
-    self.line_color = (0,0,100)
+    self.line_color = (0,0,0)
     self.bubble_width = 2
     self.padding = 5
+    self.arrows = True
     self.bullet_fill = (255,255,255)
-    self.symbol_fill = (200,150,200) #'#cac'
-    self.bubble_fill = (150,150,150) #'gray70'
-    self.text_color = (150,0,0)
+    self.symbol_fill = (179,229,252)
+    self.bubble_fill = (144,164,174)
+    self.text_color = (0,0,0)
+    self.shadow = False
+    self.shadow_fill = (0,0,0)
     self.token_font = ['Helvetica', 16, 'bold']
     self.bubble_font = ['GillSans', 14, 'bold']
     self.box_font = ['Times', 14, 'italic']
@@ -105,6 +109,7 @@ class DrawStyle(object):
           except (TypeError, ValueError):
             pass
 
+          # Check for named color
           try:
             rgb = webcolors.name_to_rgb(rgb)
           except AttributeError:
@@ -129,6 +134,9 @@ def rgb_to_cairo(rgb):
   return (r / 255.0, g / 255.0, b / 255.0)
 
 def parse_style_config(fname):
+  if os.path.exists(fname):
+    print('Reading styles from "{}"'.format(fname))
+
   cp = SafeConfigParser()
   cp.read(fname)
 
@@ -348,13 +356,14 @@ def tk_draw_shape(shape, c):
         c.create_line(left, btm, right, btm, width=width)
 
     # Add the text
-    #x,y = shape.options['text_pos']
-    x = (x0 + x1) / 2
-    y = (y0 + y1) / 2
+    if 'text' in shape.options:
+      #x,y = shape.options['text_pos']
+      x = (x0 + x1) / 2
+      y = (y0 + y1) / 2
 
-    txt = shape.options['text']
-    font = shape.options['font']
-    c.create_text(x,y, anchor='c', text=txt, font=font)
+      txt = shape.options['text']
+      font = shape.options['font']
+      c.create_text(x,y, anchor='c', text=txt, font=font)
 
   elif isinstance(shape, BoxBubbleShape):
     stroke = True if shape.options['width'] > 0 else False
@@ -369,13 +378,14 @@ def tk_draw_shape(shape, c):
       c.create_rectangle(*shape.points, width=width)
 
     # Add the text
-    #x,y = shape.options['text_pos']
-    x = (x0 + x1) / 2
-    y = (y0 + y1) / 2
+    if 'text' in shape.options:
+      #x,y = shape.options['text_pos']
+      x = (x0 + x1) / 2
+      y = (y0 + y1) / 2
 
-    txt = shape.options['text']
-    font = shape.options['font']
-    c.create_text(x,y, anchor='c', text=txt, font=font)
+      txt = shape.options['text']
+      font = shape.options['font']
+      c.create_text(x,y, anchor='c', text=txt, font=font)
 
 
 
@@ -407,7 +417,7 @@ def cairo_draw_arrow(head, tail, fill, c):
 
 def cairo_draw_text(x, y, text, font, text_color, c):
     c.save()
-    print('## TEXT COLOR:', text_color)
+    #print('## TEXT COLOR:', text_color)
     c.set_source_rgb(*rgb_to_cairo(text_color))
     pctx = pangocairo.CairoContext(c)
     pctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
@@ -535,10 +545,11 @@ def cairo_draw_shape(shape, c, styles):
 #    c.stroke()
 
     # Add the text
-    x, y = shape.options['text_pos']
-    x += (x0 + x1) / 2
-    y += (y0 + y1) / 2
-    cairo_draw_text(x, y, shape.options['text'], shape.options['font'], styles.text_color, c)
+    if 'text' in shape.options:
+      x, y = shape.options['text_pos']
+      x += (x0 + x1) / 2
+      y += (y0 + y1) / 2
+      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], styles.text_color, c)
 
   elif isinstance(shape, BoxBubbleShape):
     x0, y0, x1, y1 = shape.points
@@ -569,10 +580,11 @@ def cairo_draw_shape(shape, c, styles):
 #    c.stroke()
 
     # Add the text
-    x, y = shape.options['text_pos']
-    x += (x0 + x1) / 2
-    y += (y0 + y1) / 2
-    cairo_draw_text(x, y, shape.options['text'], shape.options['font'], styles.text_color, c)
+    if 'text' in shape.options:
+      x, y = shape.options['text_pos']
+      x += (x0 + x1) / 2
+      y += (y0 + y1) / 2
+      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], styles.text_color, c)
 
   elif isinstance(shape, OvalShape):
     x0, y0, x1, y1 = shape.points
@@ -730,19 +742,20 @@ def svg_draw_shape(shape, fh, styles):
       fh.write(u'<path d="M{},{} A{},{} 0 0,1 {},{} H{} A{},{} 0 0,1 {},{} z" {}/>\n'.format(left,y1, rad,rad,left,y0, right, rad,rad,right,y1,  attributes))
 
     # Add the text
-    x, y = shape.options['text_pos']
-    th = abs(y)
-#    y += (y0 + y1) / 2
-    x = (x0 + x1) / 2 # Center in bubble
-    y = ((y0 + y1) / 2) + th / 2
+    if 'text' in shape.options:
+      x, y = shape.options['text_pos']
+      th = abs(y)
+  #    y += (y0 + y1) / 2
+      x = (x0 + x1) / 2 # Center in bubble
+      y = ((y0 + y1) / 2) + th / 2
 
-    txt = xml_escape(shape.options['text'])
-    font_name = shape.options['font_name']
-    if 'href' in shape.options and shape.options['href'] is not None: # Hyperlink
-      href = shape.options['href']
-      fh.write(u'<a xlink:href="{}" target="_parent">\n  <text class="{} link" x="{}" y="{}">{}</text></a>\n'.format(href, font_name, x, y, txt))
-    else:
-      fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y, txt))
+      txt = xml_escape(shape.options['text'])
+      font_name = shape.options['font_name']
+      if 'href' in shape.options and shape.options['href'] is not None: # Hyperlink
+        href = shape.options['href']
+        fh.write(u'<a xlink:href="{}" target="_parent">\n  <text class="{} link" x="{}" y="{}">{}</text></a>\n'.format(href, font_name, x, y, txt))
+      else:
+        fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y, txt))
 
 
   elif isinstance(shape, BoxBubbleShape):
@@ -754,18 +767,19 @@ def svg_draw_shape(shape, fh, styles):
       x0,y0, x1-x0, y1-y0, attributes))
 
     # Add the text
-    x, y = shape.options['text_pos']
-    th = abs(y)
-    #y += (y0 + y1) / 2
-    x = (x0 + x1) / 2 # Center in bubble
-    y = ((y0 + y1) / 2) + th / 2
+    if 'text' in shape.options:
+      x, y = shape.options['text_pos']
+      th = abs(y)
+      #y += (y0 + y1) / 2
+      x = (x0 + x1) / 2 # Center in bubble
+      y = ((y0 + y1) / 2) + th / 2
 
-    txt = xml_escape(shape.options['text'])
-    font_name = shape.options['font_name']
-    if 'href' in shape.options and shape.options['href'] is not None: # Hyperlink
-      fh.write(u'<a xlink:href="{}" target="_parent">\n  <text class="{} link" x="{}" y="{}">{}</text></a>\n'.format(shape.options['href'], font_name, x, y, txt))
-    else:
-      fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y, txt))
+      txt = xml_escape(shape.options['text'])
+      font_name = shape.options['font_name']
+      if 'href' in shape.options and shape.options['href'] is not None: # Hyperlink
+        fh.write(u'<a xlink:href="{}" target="_parent">\n  <text class="{} link" x="{}" y="{}">{}</text></a>\n'.format(shape.options['href'], font_name, x, y, txt))
+      else:
+        fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y, txt))
 
   elif isinstance(shape, OvalShape):
     x0, y0, x1, y1 = shape.points
@@ -1299,7 +1313,7 @@ class RailroadLayout(object):
     bx0, by0, bx1, by1 = c.bbox(bt)
     bw = bx1 - bx0 # Back width
     dy = fy1 - by0 + vsep # Amount to shift backward objects
-    print('## LOOP:', dy, fy1, by0, vsep)
+    #print('## LOOP:', dy, fy1, by0, vsep)
     c.move(bt, 0, dy) # Move backward objects up above fwd
     # Recompute input and exit points
     biny = dy
@@ -1656,94 +1670,109 @@ def render_railroad(spec, url_map, out_file, backend, styles, scale, transparent
     app = BubbleGen(root, spec, out_file, backend, styles)
     root.mainloop();
 
-  elif backend == 'svg':
-    c2 = RailCanvas(cairo_text_bbox)
+  else: # cairo or svg
+    rc = RailCanvas(cairo_text_bbox)
 
-    layout = RailroadLayout(c2, styles, url_map)
+    layout = RailroadLayout(rc, styles, url_map)
     layout.draw_diagram(spec)
 
-    x0,y0,x1,y1 = c2.bbox('all')
+    x0,y0,x1,y1 = rc.bbox('all')
     W = int((x1 - x0 + 2*styles.padding) * scale)
     H = int((y1 - y0 + 2*styles.padding) * scale)
 
-    # Reposition all shapes in the viewport
-    for s in c2.shapes:
-      s.move(-x0 + styles.padding, -y0 + styles.padding)
+    if not styles.arrows: # Remove arrow heads
+      for s in rc.shapes:
+        if 'arrow' in s.options:
+          del s.options['arrow']
 
-    # Generate CSS for fonts
-    fonts = {
-      'token_font': styles.token_font,
-      'bubble_font': styles.bubble_font,
-      'box_font': styles.box_font
-    } # FIXME: Build dynamic
+    if styles.shadow: # Draw shadows first
+      bubs = [copy.deepcopy(s) for s in rc.shapes
+        if isinstance(s, BoxBubbleShape) or isinstance(s, BubbleShape)]
 
-    text_color = rgb_to_hex(styles.text_color)
-    css = []
-    for f, fstyle in fonts.iteritems():
-      family, size, weight = fstyle
-      if weight == 'italic':
-        style = 'italic'
-        weight = 'normal'
-      else:
-        style = 'normal'
+      # Remove all text and offset shadow
+      for s in bubs:
+        del s.options['text']
+        s.options['fill'] = '#FF0000'
+        w = s.options['width']
+        s.options['width'] = 0
+        s.move(w+1,w+1)
+
+      # Put rest of shapes after the shadows
+      bubs.extend(rc.shapes)
+      rc.shapes = bubs
 
 
-      css.append('''.{} {{fill:{}; text-anchor:middle;
-    font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(f,
-      text_color, family, size, weight, style))
+    if backend == 'svg':
 
-    font_styles = '\n'.join(css)
-    line_color = rgb_to_hex(styles.line_color)
+      # Reposition all shapes in the viewport
+      for s in rc.shapes:
+        s.move(-x0 + styles.padding, -y0 + styles.padding)
 
-    with io.open(out_file, 'w', encoding='utf-8') as fh:
-      fh.write(svg_header.format(W,H, font_styles, line_color))
+      # Generate CSS for fonts
+      fonts = {
+        'token_font': styles.token_font,
+        'bubble_font': styles.bubble_font,
+        'box_font': styles.box_font
+      } # FIXME: Build dynamic
+
+      text_color = rgb_to_hex(styles.text_color)
+      css = []
+      for f, fstyle in fonts.iteritems():
+        family, size, weight = fstyle
+        if weight == 'italic':
+          style = 'italic'
+          weight = 'normal'
+        else:
+          style = 'normal'
+
+
+        css.append('''.{} {{fill:{}; text-anchor:middle;
+      font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(f,
+        text_color, family, size, weight, style))
+
+      font_styles = '\n'.join(css)
+      line_color = rgb_to_hex(styles.line_color)
+
+      with io.open(out_file, 'w', encoding='utf-8') as fh:
+        fh.write(svg_header.format(W,H, font_styles, line_color))
+        if not transparent:
+          fh.write(u'<rect width="100%" height="100%" fill="white"/>')
+        for s in rc.shapes:
+          svg_draw_shape(s, fh, styles)
+        fh.write(u'</svg>')
+
+    else: # Cairo backend
+      ext = os.path.splitext(out_file)[1].lower()
+
+      if ext == '.svg':
+        surf = cairo.SVGSurface(out_file, W, H)
+      elif ext == '.pdf':
+        surf = cairo.PDFSurface(out_file, W, H)
+      elif ext in ('.ps', '.eps'):
+        surf = cairo.PSSurface(out_file, W, H)
+        if ext == '.eps':
+          surf.set_eps(True)
+      else: # Bitmap
+        surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+
+      ctx = cairo.Context(surf)
+
       if not transparent:
-        fh.write(u'<rect width="100%" height="100%" fill="white"/>')
-      for s in c2.shapes:
-        svg_draw_shape(s, fh, styles)
-      fh.write(u'</svg>')
+        # Fill background
+        ctx.rectangle(0,0, W,H)
+        ctx.set_source_rgb(1.0,1.0,1.0)
+        ctx.fill()
 
-  else: # Cairo backend
+      ctx.scale(scale, scale)
+      ctx.translate(-x0 + styles.padding, -y0 + styles.padding)
 
-    ext = os.path.splitext(out_file)[1].lower()
- 
-    c2 = RailCanvas(cairo_text_bbox)
-    layout = RailroadLayout(c2, styles)
-    layout.draw_diagram(spec)
+      for s in rc.shapes:
+        cairo_draw_shape(s, ctx, styles)
 
-    x0,y0,x1,y1 = c2.bbox('all')
-    W = int((x1 - x0 + 2*styles.padding) * scale)
-    H = int((y1 - y0 + 2*styles.padding) * scale)
-
-    if ext == '.svg':
-      surf = cairo.SVGSurface(out_file, W, H)
-    elif ext == '.pdf':
-      surf = cairo.PDFSurface(out_file, W, H)
-    elif ext in ('.ps', '.eps'):
-      surf = cairo.PSSurface(out_file, W, H)
-      if ext == '.eps':
-        surf.set_eps(True)
-    else: # Bitmap
-      surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
-
-    ctx = cairo.Context(surf)
-
-    if not transparent:
-      # Fill background
-      ctx.rectangle(0,0, W,H)
-      ctx.set_source_rgb(1.0,1.0,1.0)
-      ctx.fill()
-
-    ctx.scale(scale, scale)
-    ctx.translate(-x0 + styles.padding, -y0 + styles.padding)
-
-    for s in c2.shapes:
-      cairo_draw_shape(s, ctx, styles)
-
-    if ext in ('.svg', '.pdf', '.ps', '.eps'):
-      surf.show_page()
-    else:
-      surf.write_to_png(out_file)
+      if ext in ('.svg', '.pdf', '.ps', '.eps'):
+        surf.show_page()
+      else:
+        surf.write_to_png(out_file)
 
 
 
