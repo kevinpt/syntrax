@@ -88,7 +88,7 @@ class DrawStyle(object):
     self.bubble_fill = (144,164,174)
     self.text_color = (0,0,0)
     self.shadow = False
-    self.shadow_fill = (0,0,0)
+    self.shadow_fill = (0,0,0, 127)
     self.token_font = ['Helvetica', 16, 'bold']
     self.bubble_font = ['GillSans', 14, 'bold']
     self.box_font = ['Times', 14, 'italic']
@@ -120,18 +120,23 @@ class DrawStyle(object):
         setattr(self, k, v)
 
 def rgb_to_hex(rgb):
-  return '#{:02X}{:02X}{:02X}'.format(*rgb)
+  return '#{:02X}{:02X}{:02X}'.format(*rgb[:3])
 
-def hex_to_cairo(tk_rgb):
-  v = int(tk_rgb[1:], 16)
-  b = v & 0xFF
-  g = (v >> 8) & 0xFF
-  r = v >> 16
-  return (r / 255.0, g / 255.0, b / 255.0)
+#def hex_to_cairo(tk_rgb):
+#  v = int(tk_rgb[1:], 16)
+#  b = v & 0xFF
+#  g = (v >> 8) & 0xFF
+#  r = v >> 16
+#  return (r / 255.0, g / 255.0, b / 255.0)
 
 def rgb_to_cairo(rgb):
-  r,g,b = rgb
-  return (r / 255.0, g / 255.0, b / 255.0)
+  if len(rgb) == 4:
+    r,g,b,a = rgb
+    return (r / 255.0, g / 255.0, b / 255.0, a / 255.0)
+
+  else:
+    r,g,b = rgb
+    return (r / 255.0, g / 255.0, b / 255.0, 1.0)
 
 def parse_style_config(fname):
   if os.path.exists(fname):
@@ -418,7 +423,7 @@ def cairo_draw_arrow(head, tail, fill, c):
 def cairo_draw_text(x, y, text, font, text_color, c):
     c.save()
     #print('## TEXT COLOR:', text_color)
-    c.set_source_rgb(*rgb_to_cairo(text_color))
+    c.set_source_rgba(*rgb_to_cairo(text_color))
     pctx = pangocairo.CairoContext(c)
     pctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
     layout = pctx.create_layout()
@@ -434,7 +439,7 @@ def cairo_draw_text(x, y, text, font, text_color, c):
 
 def cairo_draw_shape(shape, c, styles):
   default_pen = rgb_to_cairo(styles.line_color)
-  c.set_source_rgb(*default_pen)
+  c.set_source_rgba(*default_pen)
 
   if 'width' in shape.options:
     width = shape.options['width']
@@ -488,14 +493,14 @@ def cairo_draw_shape(shape, c, styles):
 
     #print('%% RECT:', stroke, shape.options)
     if 'fill' in shape.options:
-      c.set_source_rgb(*hex_to_cairo(shape.options['fill']))
+      c.set_source_rgba(*rgb_to_cairo(shape.options['fill']))
       if stroke:
         c.fill_preserve()
       else:
         c.fill()
 
     if stroke:
-      c.set_source_rgb(*default_pen)
+      c.set_source_rgba(*default_pen)
       c.stroke()
 
   elif isinstance(shape, BubbleShape):
@@ -524,14 +529,14 @@ def cairo_draw_shape(shape, c, styles):
       c.close_path()
 
     if 'fill' in shape.options:
-      c.set_source_rgb(*hex_to_cairo(shape.options['fill']))
+      c.set_source_rgba(*rgb_to_cairo(shape.options['fill']))
       if stroke:
         c.fill_preserve()
       else:
         c.fill()
 
     if stroke:
-      c.set_source_rgb(*default_pen)
+      c.set_source_rgba(*default_pen)
       c.stroke()
 
 #    # Add text bounding box
@@ -541,7 +546,7 @@ def cairo_draw_shape(shape, c, styles):
 #    bw = abs(bx1-bx0)
 #    bh = abs(by1-by0)
 #    c.rectangle(x0 + (w - bw)//2, y0 + (h - bh)//2, bw, bh)
-#    c.set_source_rgb(*default_pen)
+#    c.set_source_rgba(*default_pen)
 #    c.stroke()
 
     # Add the text
@@ -561,14 +566,14 @@ def cairo_draw_shape(shape, c, styles):
 
     #print('%% BOXBUBBLE:', stroke, shape.options)
     if 'fill' in shape.options:
-      c.set_source_rgb(*hex_to_cairo(shape.options['fill']))
+      c.set_source_rgba(*rgb_to_cairo(shape.options['fill']))
       if stroke:
         c.fill_preserve()
       else:
         c.fill()
 
     if stroke:
-      c.set_source_rgb(*default_pen)
+      c.set_source_rgba(*default_pen)
       c.stroke()
 
 #    # Add text bounding box
@@ -576,7 +581,7 @@ def cairo_draw_shape(shape, c, styles):
 #    bw = abs(bx1-bx0)
 #    bh = abs(by1-by0)
 #    c.rectangle(x0 + (w - bw)//2, y0 + (h - bh)//2, bw, bh)
-#    c.set_source_rgb(*default_pen)
+#    c.set_source_rgba(*default_pen)
 #    c.stroke()
 
     # Add the text
@@ -597,14 +602,14 @@ def cairo_draw_shape(shape, c, styles):
     stroke = True if shape.options['width'] > 0 else False
 
     if 'fill' in shape.options:
-      c.set_source_rgb(*hex_to_cairo(shape.options['fill']))
+      c.set_source_rgba(*rgb_to_cairo(shape.options['fill']))
       if stroke:
         c.fill_preserve()
       else:
         c.fill()
 
     if stroke:
-      c.set_source_rgb(*default_pen)
+      c.set_source_rgba(*default_pen)
       c.stroke()
 
 
@@ -632,7 +637,7 @@ def cairo_draw_shape(shape, c, styles):
         c.arc_negative(xc,yc, rad, sa, ea)
       else:
         c.arc(xc,yc, rad, sa, ea)
-      c.set_source_rgb(*hex_to_cairo(shape.options['fill']))
+      c.set_source_rgba(*rgb_to_cairo(shape.options['fill']))
       c.fill()
 
     # Stroke arc segment
@@ -642,7 +647,7 @@ def cairo_draw_shape(shape, c, styles):
     else:
       c.arc(xc,yc, rad, sa, ea)
 
-    c.set_source_rgb(*default_pen)
+    c.set_source_rgba(*default_pen)
     c.stroke()
 
     #print('%% ARC:', xc, yc, rad, start, extent)
@@ -674,7 +679,10 @@ def svg_draw_shape(shape, fh, styles):
     attrs['stroke'] = default_pen
 
   if 'fill' in shape.options:
-    attrs['fill'] = shape.options['fill']
+    attrs['fill'] = rgb_to_hex(shape.options['fill'])
+
+    if len(shape.options['fill']) == 4:
+      attrs['fill-opacity'] = shape.options['fill'][3] / 255.0
 
 
   if isinstance(shape, TextShape):
@@ -1012,16 +1020,16 @@ class RailroadLayout(object):
     if re.match(r'^\w', txt): # Text token
       #txt = txt[1:]
       font = {'style':s.bubble_font, 'name':'bubble_font'}
-      fill = rgb_to_hex(s.symbol_fill)
+      fill = s.symbol_fill
       istoken = 1
     elif re.match(r'^/\w', txt): # Non-token
       txt = txt[1:]
       font = {'style':s.box_font, 'name':'box_font'}
-      fill = rgb_to_hex(s.bubble_fill)
+      fill = s.bubble_fill
       istoken = 0
     else: # Symbolic token
       font = {'style':s.token_font, 'name':'token_font'}
-      fill = rgb_to_hex(s.symbol_fill)
+      fill = s.symbol_fill
       istoken = 1
 
     return (txt, font, fill, istoken)
@@ -1036,8 +1044,10 @@ class RailroadLayout(object):
       c.create_line(0,0,1,0, width=s.bubble_width, tags=(tag,))
       return [tag, 1, 0]
     elif txt == 'bullet': # Small bullet
-      c.create_oval(0,-3,6,3, width=s.bubble_width, tags=(tag,), fill=rgb_to_hex(s.bullet_fill))
-      return [tag, 6, 0]
+      w = s.bubble_width
+      r = w+1
+      c.create_oval(0,-r,2*r,r, width=s.bubble_width, tags=(tag,), fill=s.bullet_fill)
+      return [tag, 2*r, 0]
     else: # Bubble with text inside
       txt, font, fill, istoken = self.format_text(txt)
 
@@ -1297,6 +1307,13 @@ class RailroadLayout(object):
     sep = HSEP
     vsep = VSEP
     
+
+    if isinstance(back, basestring) or back is None:
+      back = [back]
+
+    if back[0] == 'line':
+      back = back[1:]
+
     if len(back) == 1:
       if back[0] == ',': # Tight space when loop back is single comma
         vsep = 0
@@ -1372,6 +1389,12 @@ class RailroadLayout(object):
     
     sep = VSEP
     vsep = sep / 2 # Tighten spacing for top loops
+
+    if isinstance(back, basestring) or back is None:
+      back = [back]
+
+    if back[0] == 'line':
+      back = back[1:]
 
     ft, fexx, fexy = self.draw_diagram(forward)
     fx0, fy0, fx1, fy1 = c.bbox(ft)
@@ -1692,7 +1715,7 @@ def render_railroad(spec, url_map, out_file, backend, styles, scale, transparent
       # Remove all text and offset shadow
       for s in bubs:
         del s.options['text']
-        s.options['fill'] = '#FF0000'
+        s.options['fill'] = styles.shadow_fill
         w = s.options['width']
         s.options['width'] = 0
         s.move(w+1,w+1)
@@ -1760,7 +1783,7 @@ def render_railroad(spec, url_map, out_file, backend, styles, scale, transparent
       if not transparent:
         # Fill background
         ctx.rectangle(0,0, W,H)
-        ctx.set_source_rgb(1.0,1.0,1.0)
+        ctx.set_source_rgba(1.0,1.0,1.0)
         ctx.fill()
 
       ctx.scale(scale, scale)
@@ -1780,12 +1803,10 @@ def line(*args):
   return ['line'] + list(args)
 
 def loop(fwd, back):
-  if len(back) > 0 and back[0] == 'line':
-    back = back[1:]
   return ['loop', fwd, back]
 
 def toploop(fwd, back):
-  return ['toploop', fwd, [back]]
+  return ['toploop', fwd, back]
 
 def choice(*args):
   return ['or'] + list(args)
