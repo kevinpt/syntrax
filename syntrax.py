@@ -1712,8 +1712,8 @@ width="{}" height="{}" version="1.1">
 ]]>
 </style>
 <defs>
-  <marker id="arrow" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
-    <path d="M0,0 L0.5,2 L0,4 L4,2 z" fill="{}" />
+  <marker id="arrow" markerWidth="5" markerHeight="4" refX="2.5" refY="2" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L0.5,2 L0,4 L4.5,2 z" fill="{}" />
   </marker>
 </defs>
 '''
@@ -1911,18 +1911,25 @@ def parse_args():
   parser.add_argument('-v', '--version', dest='version', action='store_true', default=False, help='Syntrax version')
 
 
-  args = parser.parse_args()
+  args, unparsed = parser.parse_known_args()
   
   if args.version:
     print('Syntrax {}'.format(__version__))
     sys.exit(0)
 
+  # Allow file to be passed in without -i
+  if args.input is None and len(unparsed) > 0:
+    args.input = unparsed[0]
+
   if args.input is None:
-    print('Error: argument -i is required')
+    print('Error: input file is required')
     sys.exit(1)
     
-  if args.output is None:
+  if args.output is None: # Default to png
     args.output = os.path.splitext(args.input)[0] + '.png'
+
+  if args.output.lower() in ('png', 'svg', 'pdf', 'ps', 'eps'):
+    args.output = os.path.splitext(args.input)[0] + '.' + args.output.lower()
 
   args.scale = float(args.scale)
   
