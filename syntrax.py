@@ -17,8 +17,14 @@ import subprocess
 import cairo
 import math
 
-import pango
-import pangocairo
+try:
+  import pango
+  import pangocairo
+  use_pygobject = False
+except ImportError:
+  from gi.repository import Pango as pango
+  from gi.repository import PangoCairo as pangocairo
+  use_pygobject = True
 
 try:
   import webcolors
@@ -59,15 +65,28 @@ def cairo_font(tk_font):
 def cairo_text_bbox(text, font_params):
   surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 8, 8)
   ctx = cairo.Context(surf)
-  pctx = pangocairo.CairoContext(ctx)
-  pctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-  layout = pctx.create_layout()
   font = cairo_font(font_params)
-  layout.set_font_description(font)
 
-  layout.set_text(text)
-  #print('@@ EXTENTS:', layout.get_pixel_extents())
-  extents = layout.get_pixel_extents()[1]
+  if use_pygobject:
+    layout = pangocairo.create_layout(ctx)
+    pctx = layout.get_context()
+    fo = cairo.FontOptions()
+    fo.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+    pangocairo.context_set_font_options(pctx, fo)
+    layout.set_font_description(font)
+    layout.set_text(text, len(text))
+    re = layout.get_pixel_extents()[1]
+    extents = (re.x, re.y, re.x + re.width, re.y + re.height)
+
+  else: # pyGtk
+    pctx = pangocairo.CairoContext(ctx)
+    pctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+    layout = pctx.create_layout()
+    layout.set_font_description(font)
+    layout.set_text(text)
+
+    #print('@@ EXTENTS:', layout.get_pixel_extents()[1])
+    extents = layout.get_pixel_extents()[1]
   w = extents[2] - extents[0]
   h = extents[3] - extents[1]
   x0 = - w // 2.0
@@ -421,20 +440,34 @@ def cairo_draw_arrow(head, tail, fill, c):
   c.restore()
 
 def cairo_draw_text(x, y, text, font, text_color, c):
-    c.save()
-    #print('## TEXT COLOR:', text_color)
-    c.set_source_rgba(*rgb_to_cairo(text_color))
+  c.save()
+  #print('## TEXT COLOR:', text_color)
+  c.set_source_rgba(*rgb_to_cairo(text_color))
+  font = cairo_font(font)
+
+  c.translate(x, y)
+
+  if use_pygobject:
+    layout = pangocairo.create_layout(c)
+    pctx = layout.get_context()
+    fo = cairo.FontOptions()
+    fo.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+    pangocairo.context_set_font_options(pctx, fo)
+    layout.set_font_description(font)
+    layout.set_text(text, len(text))
+    pangocairo.update_layout(c, layout)
+    pangocairo.show_layout(c, layout)
+
+  else: # pyGtk
     pctx = pangocairo.CairoContext(c)
     pctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
     layout = pctx.create_layout()
-    font = cairo_font(font)
     layout.set_font_description(font)
-
-    c.translate(x, y)
     layout.set_text(text)
     pctx.update_layout(layout)
     pctx.show_layout(layout)
-    c.restore()
+
+  c.restore()
 
 
 def cairo_draw_shape(shape, c, styles):
