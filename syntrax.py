@@ -1898,6 +1898,33 @@ def parse_spec_file(fname):
 
   return spec, url_map
 
+def dump_style_ini(ini_file):
+  keys= ('line_width',
+    'bubble_width',
+    'padding',
+    'line_color',
+    'arrows',
+    'bullet_fill',
+    'symbol_fill',
+    'bubble_fill',
+    'text_color',
+    'shadow',
+    'shadow_fill',
+    'token_font',
+    'bubble_font',
+    'box_font')
+
+  defaults = DrawStyle()
+
+  if os.path.exists(ini_file):
+    print('Ini file "{}" exists'.format(ini_file))
+    return
+
+  print('Creating ini with default styles in "{}"'.format(ini_file))
+  with open(ini_file, 'w') as fh:
+    fh.write('[style]\n')
+    for k in keys:
+      fh.write('{} = {}\n'.format(k, getattr(defaults, k)))
 
 def parse_args():
   parser = argparse.ArgumentParser(description='Railroad diagram generator')
@@ -1909,12 +1936,18 @@ def parse_args():
   parser.add_argument('--scale', dest='scale', action='store', default='1', help='Scale image')
   #parser.add_argument('-b', '--backend', dest='backend', action='store', default='cairo', help='Backend renderer')
   parser.add_argument('-v', '--version', dest='version', action='store_true', default=False, help='Syntrax version')
+  parser.add_argument('--get-style', dest='get_style', action='store_true', default=False,
+    help='Create default style .ini')
 
 
   args, unparsed = parser.parse_known_args()
   
   if args.version:
     print('Syntrax {}'.format(__version__))
+    sys.exit(0)
+
+  if args.get_style:
+    dump_style_ini('syntrax.ini')
     sys.exit(0)
 
   # Allow file to be passed in without -i
