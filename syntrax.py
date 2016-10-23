@@ -2,8 +2,6 @@
 
 from __future__ import print_function
 
-import Tkinter as tk
-import tkFont as tkf
 import re
 import argparse
 from ConfigParser import SafeConfigParser
@@ -39,23 +37,6 @@ RADIUS = 9
 HSEP = 17
 VSEP = 9
 DPI = 80
-
-
-def tk_text_bbox(text, font_params):
-
-  font = tkf.Font(family = font_params[0], size = font_params[1], weight = font_params[2] )
-
-  root = tk.Tk()
-  w = font.measure(text)
-  h = font.metrics('linespace')
-  root.destroy()
-
-  x0 = -w//2
-  y0 = -h//2
-  x1 = x0 + w
-  y1 = y0 + h
-
-  return [x0, y0, x1, y1]
 
 
 def cairo_font(tk_font):
@@ -331,86 +312,6 @@ class BoxBubbleShape(BaseShape):
     self.options = options
     self._bbox = [x0, y0, x1, y1]
     self.update_tags()
-
-
-def tk_draw_shape(shape, c):
-  if isinstance(shape, TextShape):
-    x0, y0, x1, y1 = shape.points
-    x = (x0 + x1) / 2
-    y = (y0 + y1) / 2
-    c.create_text(x, y, **shape.options)
-  elif isinstance(shape, LineShape):
-    c.create_line(*shape.points, **shape.options)
-  elif isinstance(shape, RectShape):
-    c.create_rectangle(*shape.points, **shape.options)
-  elif isinstance(shape, OvalShape):
-    c.create_oval(*shape.points, **shape.options)
-  elif isinstance(shape, ArcShape):
-    c.create_arc(*shape.points, **shape.options)
-  elif isinstance(shape, BubbleShape):
-    x0, y0, x1, y1 = shape.points
-
-    stroke = True if shape.options['width'] > 0 else False
-
-    rad = (y1 - y0) / 2.0
-    left = x0 + rad
-    right = x1 - rad
-    top = y1
-    btm = y0
-
-    xc = (x0 + x1) / 2
-    yc = (y0 + y1) / 2.0
-
-    if 'fill' in shape.options:
-      fill = shape.options['fill']
-      c.create_arc(left-rad, top, left+rad, btm, width=0, fill=fill, outline=fill, start=90, extent=180, style='pieslice')
-      c.create_arc(right-rad, top, right+rad, btm, width=0, fill=fill, outline=fill, start=-90, extent=180, style='pieslice')
-
-      if left < right: # Fill the middle
-        c.create_rectangle(left, top, right, btm, width=0, fill=fill, outline=fill)
-
-    # Outline
-    if stroke:
-      width = shape.options['width']
-      c.create_arc(left-rad, top, left+rad, btm, width=width, start=90, extent=180, style='arc')
-      c.create_arc(right-rad, top, right+rad, btm, width=width, start=-90, extent=180, style='arc')
-
-      if left < right: # Join rounded ends in the middle
-        c.create_line(left, top, right, top, width=width)
-        c.create_line(left, btm, right, btm, width=width)
-
-    # Add the text
-    if 'text' in shape.options:
-      #x,y = shape.options['text_pos']
-      x = (x0 + x1) / 2
-      y = (y0 + y1) / 2
-
-      txt = shape.options['text']
-      font = shape.options['font']
-      c.create_text(x,y, anchor='c', text=txt, font=font)
-
-  elif isinstance(shape, BoxBubbleShape):
-    stroke = True if shape.options['width'] > 0 else False
-
-    if 'fill' in shape.options:
-      fill = shape.options['fill']
-      c.create_rectangle(*shape.points, width=0, fill=fill)
-
-    # Outline
-    if stroke:
-      width = shape.options['width']
-      c.create_rectangle(*shape.points, width=width)
-
-    # Add the text
-    if 'text' in shape.options:
-      #x,y = shape.options['text_pos']
-      x = (x0 + x1) / 2
-      y = (y0 + y1) / 2
-
-      txt = shape.options['text']
-      font = shape.options['font']
-      c.create_text(x,y, anchor='c', text=txt, font=font)
-
 
 
 def cairo_draw_arrow(head, tail, fill, c):
@@ -869,7 +770,7 @@ class RailCanvas(object):
      It implements an abstracted canvas that can render objects to different
      backends other than just a Tk canvas widget.
   '''
-  def __init__(self, text_bbox=tk_text_bbox):
+  def __init__(self, text_bbox=cairo_text_bbox):
     self.text_bbox = text_bbox
     self.shapes = []
 
@@ -1603,96 +1504,6 @@ class RailroadLayout(object):
         
     return None
 
-class BubbleGen(tk.Frame):
-  def __init__(self, parent, spec, out_file, backend, styles):
-    tk.Frame.__init__(self, parent)
-    
-    self.spec = spec
-    self.out_file = out_file
-    
-    parent.title('Bubble generator')
-    self.pack(fill='both', expand=1)
-    
-#    self.btnGen = tk.Button(self, text='Generate diagram', command=self.draw_graph)
-#    self.btnGen.pack()
-    
-    self.canvas = tk.Canvas(self, width=800, height=600)
-    self.canvas.pack()
-    
-    self.draw_graph(backend)
-
-  def draw_graph(self, backend='rc'):
-    c = None
-
-    # Choose between true Tk canvas or the the emulated canvas
-    if backend == 'tk':
-      c = self.canvas
-      c.delete('all')
-      c2 = c
-    elif backend == 'rc':
-      c = self.canvas
-      c2 = RailCanvas()
-    
-    layout = RailroadLayout(c2, styles)
-    
-#    drawer.draw_diagram( \
-#      ['rightstack',
-#        ['line', ['1my_bubble'], ['/bub1']],
-#        ['line', ['/next_line'], ['/bub2'], ['loop', ['/foo'], [',x']], ['/bub3'] ],
-#      ]
-#    )
-
-#    drawer.draw_diagram( ['line', '/foo', '/bar'] )
-
-#    drawer.draw_diagram( \
-#      ['opt',
-#        ['line', 'bullet', '1my_bubble', '/bub1'],
-#        ['line', '/next_line', '/bub2', ['toploop', ['/foobar-bubble'], [',x']], '/bub3' ],
-#        ['line', '/next_line', '/bub2', ['loop', ['/foobar-bubble'], [',x']], '/bub3' ],
-#      ]
-#    )
-
-#    drawer.draw_diagram(\
-#    ['line', '/foo', ['optloop', ['/foobar'], ['/bazz']], '/bar']
-#    )
-
-#    drawer.draw_diagram(\
-#    ['line', '/foo', ['tailbranch', ['line', '/foobar'], ['line', '/bazz']], '/bar']
-#    )
-
-    layout.draw_diagram(self.spec)
-    
-    if backend == 'rc':
-      print('## BBOX:', c2.bbox(), len(c2.shapes))
-      c2.draw(c) # Render abstract canvas objects onto the actual Tk canvas
-
-    if c.bbox('all'):
-      x0,y0,x1,y1 = c.bbox('all')
-
-      #x0,y0,x1,y1 = (0,0,800,600)
-
-      #c.move('all', 2-x0, 2-y0)
-      c.move('all', -x0 + 2, -y0 + 2)
-      x0,y0,x1,y1 = c.bbox('all')
-
-      c.config(width=x1-x0, height=y1-y0)
-      c.update()
-      c.postscript(file=self.out_file, colormode='color')
-
-      # Convert to PNG
-      png_file = os.path.splitext(self.out_file)[0] + '.png'
-      subprocess.call('convert -density 400 {} -background white -alpha remove -resize 25% {}'.format(args.output, png_file), shell=True)
-
-      sys.exit(0)
-
-      c.create_rectangle(-100, -100, x1+100, y1+100, fill='white', outline='white', tags=('bgrect',))
-      c.lower('bgrect')
-
-  #    c.create_rectangle(x0,y0,x1,y1, outline='red')
-
-      c.config(width=x1+100, height=y1+100)
-
-      c.update()
 
 svg_header = u'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created by Syntax-Trax http://kevinpt.github.io/syntax-trax -->
@@ -1720,115 +1531,108 @@ width="{}" height="{}" version="1.1">
 
 def render_railroad(spec, url_map, out_file, backend, styles, scale, transparent):
   print('Rendering to {} using {} backend'.format(out_file, backend))
-  if backend in ['tk', 'rc']:
-    # Render using tk
-    root = tk.Tk()
-    app = BubbleGen(root, spec, out_file, backend, styles)
-    root.mainloop();
+  rc = RailCanvas(cairo_text_bbox)
 
-  else: # cairo or svg
-    rc = RailCanvas(cairo_text_bbox)
+  layout = RailroadLayout(rc, styles, url_map)
+  layout.draw_diagram(spec)
 
-    layout = RailroadLayout(rc, styles, url_map)
-    layout.draw_diagram(spec)
+  x0,y0,x1,y1 = rc.bbox('all')
+  W = int((x1 - x0 + 2*styles.padding) * scale)
+  H = int((y1 - y0 + 2*styles.padding) * scale)
 
-    x0,y0,x1,y1 = rc.bbox('all')
-    W = int((x1 - x0 + 2*styles.padding) * scale)
-    H = int((y1 - y0 + 2*styles.padding) * scale)
+  if not styles.arrows: # Remove arrow heads
+    for s in rc.shapes:
+      if 'arrow' in s.options:
+        del s.options['arrow']
 
-    if not styles.arrows: # Remove arrow heads
-      for s in rc.shapes:
-        if 'arrow' in s.options:
-          del s.options['arrow']
+  if styles.shadow: # Draw shadows first
+    bubs = [copy.deepcopy(s) for s in rc.shapes
+      if isinstance(s, BoxBubbleShape) or isinstance(s, BubbleShape)]
 
-    if styles.shadow: # Draw shadows first
-      bubs = [copy.deepcopy(s) for s in rc.shapes
-        if isinstance(s, BoxBubbleShape) or isinstance(s, BubbleShape)]
+    # Remove all text and offset shadow
+    for s in bubs:
+      del s.options['text']
+      s.options['fill'] = styles.shadow_fill
+      w = s.options['width']
+      s.options['width'] = 0
+      s.move(w+1,w+1)
 
-      # Remove all text and offset shadow
-      for s in bubs:
-        del s.options['text']
-        s.options['fill'] = styles.shadow_fill
-        w = s.options['width']
-        s.options['width'] = 0
-        s.move(w+1,w+1)
-
-      # Put rest of shapes after the shadows
-      bubs.extend(rc.shapes)
-      rc.shapes = bubs
+    # Put rest of shapes after the shadows
+    bubs.extend(rc.shapes)
+    rc.shapes = bubs
 
 
-    if backend == 'svg':
+  if backend == 'svg':
 
-      # Reposition all shapes in the viewport
-      for s in rc.shapes:
-        s.move(-x0 + styles.padding, -y0 + styles.padding)
+    # Reposition all shapes in the viewport
+    for s in rc.shapes:
+      s.move(-x0 + styles.padding, -y0 + styles.padding)
 
-      # Generate CSS for fonts
-      fonts = {
-        'token_font': styles.token_font,
-        'bubble_font': styles.bubble_font,
-        'box_font': styles.box_font
-      } # FIXME: Build dynamic
+    # Generate CSS for fonts
+    fonts = {
+      'token_font': styles.token_font,
+      'bubble_font': styles.bubble_font,
+      'box_font': styles.box_font
+    } # FIXME: Build dynamic
 
-      text_color = rgb_to_hex(styles.text_color)
-      css = []
-      for f, fstyle in fonts.iteritems():
-        family, size, weight = fstyle
-        if weight == 'italic':
-          style = 'italic'
-          weight = 'normal'
-        else:
-          style = 'normal'
-
-
-        css.append('''.{} {{fill:{}; text-anchor:middle;
-      font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(f,
-        text_color, family, size, weight, style))
-
-      font_styles = '\n'.join(css)
-      line_color = rgb_to_hex(styles.line_color)
-
-      with io.open(out_file, 'w', encoding='utf-8') as fh:
-        fh.write(svg_header.format(W,H, font_styles, line_color))
-        if not transparent:
-          fh.write(u'<rect width="100%" height="100%" fill="white"/>')
-        for s in rc.shapes:
-          svg_draw_shape(s, fh, styles)
-        fh.write(u'</svg>')
-
-    else: # Cairo backend
-      ext = os.path.splitext(out_file)[1].lower()
-
-      if ext == '.svg':
-        surf = cairo.SVGSurface(out_file, W, H)
-      elif ext == '.pdf':
-        surf = cairo.PDFSurface(out_file, W, H)
-      elif ext in ('.ps', '.eps'):
-        surf = cairo.PSSurface(out_file, W, H)
-        if ext == '.eps':
-          surf.set_eps(True)
-      else: # Bitmap
-        surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
-
-      ctx = cairo.Context(surf)
-
-      if not transparent:
-        # Fill background
-        ctx.rectangle(0,0, W,H)
-        ctx.set_source_rgba(1.0,1.0,1.0)
-        ctx.fill()
-
-      ctx.scale(scale, scale)
-      ctx.translate(-x0 + styles.padding, -y0 + styles.padding)
-
-      for s in rc.shapes:
-        cairo_draw_shape(s, ctx, styles)
-
-      if ext in ('.svg', '.pdf', '.ps', '.eps'):
-        surf.show_page()
+    text_color = rgb_to_hex(styles.text_color)
+    css = []
+    for f, fstyle in fonts.iteritems():
+      family, size, weight = fstyle
+      if weight == 'italic':
+        style = 'italic'
+        weight = 'normal'
       else:
-        surf.write_to_png(out_file)
+        style = 'normal'
+
+
+      css.append('''.{} {{fill:{}; text-anchor:middle;
+    font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(f,
+      text_color, family, size, weight, style))
+
+    font_styles = '\n'.join(css)
+    line_color = rgb_to_hex(styles.line_color)
+
+    with io.open(out_file, 'w', encoding='utf-8') as fh:
+      fh.write(svg_header.format(W,H, font_styles, line_color))
+      if not transparent:
+        fh.write(u'<rect width="100%" height="100%" fill="white"/>')
+      for s in rc.shapes:
+        svg_draw_shape(s, fh, styles)
+      fh.write(u'</svg>')
+
+  else: # Cairo backend
+    ext = os.path.splitext(out_file)[1].lower()
+
+    if ext == '.svg':
+      surf = cairo.SVGSurface(out_file, W, H)
+    elif ext == '.pdf':
+      surf = cairo.PDFSurface(out_file, W, H)
+    elif ext in ('.ps', '.eps'):
+      surf = cairo.PSSurface(out_file, W, H)
+      if ext == '.eps':
+        surf.set_eps(True)
+    else: # Bitmap
+      surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+
+    ctx = cairo.Context(surf)
+
+    if not transparent:
+      # Fill background
+      ctx.rectangle(0,0, W,H)
+      ctx.set_source_rgba(1.0,1.0,1.0)
+      ctx.fill()
+
+    ctx.scale(scale, scale)
+    ctx.translate(-x0 + styles.padding, -y0 + styles.padding)
+
+    for s in rc.shapes:
+      cairo_draw_shape(s, ctx, styles)
+
+    if ext in ('.svg', '.pdf', '.ps', '.eps'):
+      surf.show_page()
+    else:
+      surf.write_to_png(out_file)
 
 
 
@@ -1934,7 +1738,6 @@ def parse_args():
   parser.add_argument('-t', '--transparent', dest='transparent', action='store_true',
     default=False, help='Transparent background')
   parser.add_argument('--scale', dest='scale', action='store', default='1', help='Scale image')
-  #parser.add_argument('-b', '--backend', dest='backend', action='store', default='cairo', help='Backend renderer')
   parser.add_argument('-v', '--version', dest='version', action='store_true', default=False, help='Syntrax version')
   parser.add_argument('--get-style', dest='get_style', action='store_true', default=False,
     help='Create default style .ini')
@@ -1980,7 +1783,7 @@ def main():
   #print('## spec', spec)
 
   # Force SVG backend for SVG output
-  backend = 'cairo' #args.backend
+  backend = 'cairo'
   if os.path.splitext(args.output)[1].lower() == '.svg':
     backend = 'svg'
   
