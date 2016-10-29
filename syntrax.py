@@ -90,8 +90,9 @@ class DrawStyle(object):
     self.shadow = False
     self.shadow_fill = (0,0,0, 127)
     self.token_font = ['Helvetica', 16, 'bold']
-    self.bubble_font = ['GillSans', 14, 'bold']
+    self.bubble_font = ['Helvetica', 14, 'bold']
     self.box_font = ['Times', 14, 'italic']
+    self.title_font = ['Helvetica', 24, 'bold']
 
     # Load any styles
     if styles is None:
@@ -99,35 +100,37 @@ class DrawStyle(object):
 
     for k,v in styles.iteritems():
       if hasattr(self, k):
-        # Check for web colors
-        if have_webcolors and (k.endswith('_fill') or k.endswith('_color')):
+        # Check for color styles
+        if k.endswith('_fill') or k.endswith('_color'):
           rgb = v
 
           # Check for hex string
           try:
-            rgb = webcolors.hex_to_rgb(rgb)
+            rgb = hex_to_rgb(rgb)
           except (TypeError, ValueError):
             pass
 
           # Check for named color
-          try:
-            rgb = webcolors.name_to_rgb(rgb)
-          except AttributeError:
-            pass
+          if have_webcolors:
+            try:
+              rgb = webcolors.name_to_rgb(rgb)
+            except AttributeError:
+              pass
 
-          rgb = webcolors.normalize_integer_triplet(rgb)
+          # Restrict to valid range
+          rgb = [0 if c < 0 else 255 if c > 255 else c for c in rgb]
           v = rgb
         setattr(self, k, v)
 
 def rgb_to_hex(rgb):
   return '#{:02X}{:02X}{:02X}'.format(*rgb[:3])
 
-#def hex_to_cairo(tk_rgb):
-#  v = int(tk_rgb[1:], 16)
-#  b = v & 0xFF
-#  g = (v >> 8) & 0xFF
-#  r = v >> 16
-#  return (r / 255.0, g / 255.0, b / 255.0)
+def hex_to_rgb(hex_color):
+  v = int(hex_color[1:], 16)
+  b = v & 0xFF
+  g = (v >> 8) & 0xFF
+  r = (v >> 16) & 0xFF
+  return (r,g,b)
 
 def rgb_to_cairo(rgb):
   if len(rgb) == 4:
@@ -295,9 +298,24 @@ class TextShape(BaseShape):
   def __init__(self, x0, y0, text_bbox, options):
     BaseShape.__init__(self)
     self.options = options
-    self._bbox = text_bbox(options['text'], options['font'])
+
+    if 'anchor' in options:
+      anchor = options['anchor'].lower()
+    else:
+      anchor = 'l'
+
+    bx0,by0, bx1,by1 = text_bbox(options['text'], options['font'])
+    w = bx1 - bx0
+    h = by1 - by0
+
+    if anchor == 'c':
+      x0 -= w//2
+      y0 -= h//2
+
+    self._bbox = [x0, y0, x0+w, y0+h]
+    #self._bbox = text_bbox(options['text'], options['font'])
     self.update_tags()
-    #print('## NEW TEXT:', self._bbox)
+    #print('## NEW TEXT:', x0, y0, self._bbox, anchor)
 
 class BubbleShape(BaseShape):
   def __init__(self, x0, y0, x1, y1, options):
@@ -621,10 +639,11 @@ def svg_draw_shape(shape, fh, styles):
 
   if isinstance(shape, TextShape):
     x0, y0, x1, y1 = shape.points
-    x = (x0 + x1) / 2
+    x = (x0 + x1) / 2 # Center text
+    y = y1 - 10 # FIXME: Adjust for baseline offset
 
     font_name = shape.options['font_name']
-    fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y0,
+    fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y,
       xml_escape(shape.options['text'])))
 
   elif isinstance(shape, LineShape):
@@ -1163,13 +1182,13 @@ class RailroadLayout(object):
         enter_y = btm - ty0 + sep*2 + 2
         if bypass:
           next_bypass_y = enter_y - RADIUS
-        if indent < 0:
+        if indent < 0: # rightstack
           w = tx1 - tx0
           enter_x = exit_x - w + sep*indent
           ex2 = sep*2 - indent
           if ex2 > enter_x:
             enter_x = ex2
-        else:
+        else: # stack & indentstack
           enter_x = sep*2 + indent
       
         back_y = btm + sep + 1
@@ -1500,7 +1519,7 @@ class RailroadLayout(object):
         # NOTE: The original Tcl had a draw_tail_branch proc that was unused here
         return self.draw_or(spec[1:])
       else:
-        pass # FIXME: ERROR
+        raise ValueError('Unrecognized diagram element: "{}"'.format(spec[0]))
         
     return None
 
@@ -1529,14 +1548,26 @@ width="{}" height="{}" version="1.1">
 </defs>
 '''
 
-def render_railroad(spec, url_map, out_file, backend, styles, scale, transparent):
+def render_railroad(spec, title, url_map, out_file, backend, styles, scale, transparent):
   print('Rendering to {} using {} backend'.format(out_file, backend))
   rc = RailCanvas(cairo_text_bbox)
 
   layout = RailroadLayout(rc, styles, url_map)
   layout.draw_diagram(spec)
 
+  if title is not None: # Add title
+    x0,y0,x1,y1 = rc.bbox('all')
+
+    tid = rc.create_text(x0, y0, anchor='l', text=title, font=styles.title_font,
+      font_name='title_font')
+
+    tx0, ty0, tx1, ty1 = rc.bbox(tid)
+    h = ty1 - ty0
+
+    rc.move(tid, 0, -(h + styles.padding))
+
   x0,y0,x1,y1 = rc.bbox('all')
+
   W = int((x1 - x0 + 2*styles.padding) * scale)
   H = int((y1 - y0 + 2*styles.padding) * scale)
 
@@ -1569,22 +1600,17 @@ def render_railroad(spec, url_map, out_file, backend, styles, scale, transparent
       s.move(-x0 + styles.padding, -y0 + styles.padding)
 
     # Generate CSS for fonts
-    fonts = {
-      'token_font': styles.token_font,
-      'bubble_font': styles.bubble_font,
-      'box_font': styles.box_font
-    } # FIXME: Build dynamic
-
     text_color = rgb_to_hex(styles.text_color)
     css = []
-    for f, fstyle in fonts.iteritems():
-      family, size, weight = fstyle
+
+    for f in [k for k in dir(styles) if k.endswith('_font')]:
+      family, size, weight = getattr(styles, f)
+
       if weight == 'italic':
         style = 'italic'
         weight = 'normal'
       else:
         style = 'normal'
-
 
       css.append('''.{} {{fill:{}; text-anchor:middle;
     font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(f,
@@ -1716,7 +1742,8 @@ def dump_style_ini(ini_file):
     'shadow_fill',
     'token_font',
     'bubble_font',
-    'box_font')
+    'box_font',
+    'title_font')
 
   defaults = DrawStyle()
 
@@ -1735,6 +1762,7 @@ def parse_args():
   parser.add_argument('-i', '--input', dest='input', action='store', help='Diagram spec file')
   parser.add_argument('-o', '--output', dest='output', action='store', help='Output file')
   parser.add_argument('-s', '--style', dest='styles', action='store', default='syntrax.ini', help='Style config file')
+  parser.add_argument('--title', dest='title', action='store', help='Diagram title')
   parser.add_argument('-t', '--transparent', dest='transparent', action='store_true',
     default=False, help='Transparent background')
   parser.add_argument('--scale', dest='scale', action='store', default='1', help='Scale image')
@@ -1787,7 +1815,10 @@ def main():
   if os.path.splitext(args.output)[1].lower() == '.svg':
     backend = 'svg'
   
-  render_railroad(spec, url_map, args.output, backend, styles, args.scale, args.transparent)
+  #title = 'JSON syntax number'
+  #title = None
+
+  render_railroad(spec, args.title, url_map, args.output, backend, styles, args.scale, args.transparent)
   
 
 if __name__ == '__main__':
