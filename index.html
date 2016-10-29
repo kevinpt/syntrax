@@ -1,0 +1,555 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Syntrax &mdash; Syntrax 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/project.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Syntrax 0.9 documentation" href="#" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="syntrax">
+<h1>Syntrax<a class="headerlink" href="#syntrax" title="Permalink to this headline">¶</a></h1>
+<p>Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected bubbles.</p>
+<p>The specification is a set of nested Python function calls:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">indentstack</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span>
+  <span class="n">line</span><span class="p">(</span><span class="n">opt</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">),</span> <span class="n">choice</span><span class="p">(</span><span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;1-9&#39;</span><span class="p">,</span> <span class="n">loop</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;0-9&#39;</span><span class="p">))),</span>
+    <span class="n">opt</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">loop</span><span class="p">(</span><span class="s">&#39;0-9&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))),</span>
+
+  <span class="n">line</span><span class="p">(</span><span class="n">opt</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">),</span> <span class="n">choice</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="s">&#39;-&#39;</span><span class="p">),</span> <span class="n">loop</span><span class="p">(</span><span class="s">&#39;0-9&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)))</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This is processed to generate an SVG image:</p>
+<div class="figure align-center">
+<img src="_images/json_number.svg" /><p class="caption">JSON number syntax</p>
+</div>
+<p>Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have hyperlinked text allowing users to quickly navigate to documentation of different syntax elements.</p>
+<p>Syntrax is a heaviliy modified version of the railroad diagram generator used for the <a class="reference external" href="https://www.sqlite.org/lang.html">SQLite documentation</a>. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Syntrax requires either Python 2.7 or Python 3.x, Pycairo, and Pango.</p>
+<p>The installation script depends on setuptools which will be installed if it
+isn&#8217;t currently present in your Python distribution. The source is written in
+Python 2.7 syntax but will convert cleanly to Python 3 when the installer
+passes it through 2to3.</p>
+<p>The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax.</p>
+</div>
+<div class="section" id="licensing">
+<h2>Licensing<a class="headerlink" href="#licensing" title="Permalink to this headline">¶</a></h2>
+<p>Syntrax is licensed for free commercial and non-commercial use under the terms of the MIT license.</p>
+</div>
+<div class="section" id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>You can access the Syntrax Git repository from <a class="reference external" href="https://github.com/kevinpt/syntrax">Github</a>. You can install direct from PyPI with the &#8220;pip&#8221;
+command if you have it available.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Syntrax is a Python application. You must have Python installed first to use it. Most modern Linux distributions and OS/X have it available by default. There are a number of options available for Windows. If you don&#8217;t already have a favorite, I recommend getting one of the <a class="reference external" href="http://www.scipy.org/install.html">&#8220;full-stack&#8221; Python distros</a> that are geared toward scientific computing such as Anaconda or Python(x,y).</p>
+<p>If your OS has a package manager, it may be preferable to install Python setuptools through that tool before attempting to install Syntrax. Otherwise, the installation script will install these packages directly without registering them with the OS package manager.</p>
+<p>The easiest way to install Syntrax is from <a class="reference external" href="https://pypi.python.org/pypi/syntrax">PyPI</a>.</p>
+<div class="highlight-sh"><div class="highlight"><pre>&gt; pip install --upgrade syntrax
+</pre></div>
+</div>
+<p>This will download and install the latest release, upgrading if you already have it installed. If you don&#8217;t have <tt class="docutils literal"><span class="pre">pip</span></tt> you may have the <tt class="docutils literal"><span class="pre">easy_install</span></tt> command available which can be used to install <tt class="docutils literal"><span class="pre">pip</span></tt> on your system:</p>
+<div class="highlight-sh"><div class="highlight"><pre>&gt; easy_install pip
+</pre></div>
+</div>
+<p>You can also use <tt class="docutils literal"><span class="pre">pip</span></tt> to get the latest development code from Github:</p>
+<div class="highlight-sh"><div class="highlight"><pre>&gt; pip install --upgrade https://github.com/kevinpt/syntrax/tarball/master
+</pre></div>
+</div>
+<p>If you manually downloaded a source package or created a clone with Git you can install Syntrax with the following command run from the base Syntrax directory:</p>
+<div class="highlight-sh"><div class="highlight"><pre>&gt; python setup.py install
+</pre></div>
+</div>
+<p>On Linux systems you may need to install with root privileges using the <em>sudo</em> command.</p>
+<p>After a successful install the Syntrax command line application will be available. On Linux they should be immediately accessible from your current search path. On Windows you will need to make sure that the <tt class="docutils literal"><span class="pre">&lt;Python</span> <span class="pre">root&gt;\Scripts</span></tt> directory is in your %PATH% environment variable.</p>
+<p>If you can&#8217;t use the installer script, it is possible to use <tt class="docutils literal"><span class="pre">syntrax.py</span></tt> directly without installation. If you need to use Python 3 you can manually convert it with the <tt class="docutils literal"><span class="pre">2to3</span></tt> tool:</p>
+<div class="highlight-sh"><div class="highlight"><pre>&gt; 2to3 -w syntrax.py
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-syntrax">
+<h2>Using Syntrax<a class="headerlink" href="#using-syntrax" title="Permalink to this headline">¶</a></h2>
+<p>Syntrax is a command line tool. You pass it an input specification file and it will generate a diagram in any of the supported output formats.</p>
+<div class="highlight-python"><div class="highlight"><pre>usage: syntrax.py [-h] [-i INPUT] [-o OUTPUT] [-s STYLES] [--title TITLE] [-t]
+                  [--scale SCALE] [-v] [--get-style]
+
+Railroad diagram generator
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Diagram spec file
+  -o OUTPUT, --output OUTPUT
+                        Output file
+  -s STYLES, --style STYLES
+                        Style config file
+  --title TITLE         Diagram title
+  -t, --transparent     Transparent background
+  --scale SCALE         Scale image
+  -v, --version         Syntrax version
+  --get-style           Create default style .ini
+</pre></div>
+</div>
+<p>Any argument not associated with a flag is assumed to be the input file name. The default output format is PNG.</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; syntrax foo.spec
+Rendering to foo.png using cairo backend
+</pre></div>
+</div>
+<p>You can specify the specific out file you want with the <tt class="docutils literal"><span class="pre">-o</span></tt> option. The extension determines the format. You can also pass just the extension to <tt class="docutils literal"><span class="pre">-o</span></tt> and Syntrax will use the input file base name for the output image:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; syntrax -i foo.spec -o bar.pdf
+Rendering to bar.pdf using cairo backend
+
+
+&gt; syntrax -i foo.spec -o eps
+Rendering to foo.eps using cairo backend
+</pre></div>
+</div>
+<p>By default the images have a white background. If you want a transparent background pass the <tt class="docutils literal"><span class="pre">-t</span></tt> option.</p>
+<p>You can control the scale of the resulting image with the <tt class="docutils literal"><span class="pre">--scale</span></tt> option. It takes a floating point scale factor. This is most useful for the PNG output.</p>
+</div>
+<div class="section" id="specification-language">
+<h2>Specification language<a class="headerlink" href="#specification-language" title="Permalink to this headline">¶</a></h2>
+<p>Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with &#8220;/&#8221;. Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for FIXME.</p>
+<p>The following functions are available for creating diagrams:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="38%" />
+<col width="35%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>line()</td>
+<td>loop()</td>
+<td>toploop()</td>
+</tr>
+<tr class="row-even"><td>choice()</td>
+<td>opt()</td>
+<td>optx()</td>
+</tr>
+<tr class="row-odd"><td>stack()</td>
+<td>indentstack()</td>
+<td>rightstack()</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="line">
+<h3>line<a class="headerlink" href="#line" title="Permalink to this headline">¶</a></h3>
+<p>A <tt class="docutils literal"><span class="pre">line()</span></tt> creates a series of nodes arranged horizontally from left to right.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">line</span><span class="p">(</span><span class="s">&#39;[&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;/bar&#39;</span><span class="p">,</span> <span class="s">&#39;]&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_line.png" src="_images/syntax_line.png" />
+</div>
+<div class="section" id="loop">
+<h3>loop<a class="headerlink" href="#loop" title="Permalink to this headline">¶</a></h3>
+<p>A <tt class="docutils literal"><span class="pre">loop()</span></tt> represents a repeatable section of the syntax diagram. It takes two arguments. The first is the line of nodes for the forward path and the second is the nodes for the backward path. The backward path is rendered with nodes ordered from right to left.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">loop</span><span class="p">(</span><span class="n">line</span><span class="p">(</span><span class="s">&#39;/forward&#39;</span><span class="p">,</span> <span class="s">&#39;path&#39;</span><span class="p">),</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;backward&#39;</span><span class="p">,</span> <span class="s">&#39;path&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_loop.png" src="_images/syntax_loop.png" />
+<p>Either the forward or backward path can be <tt class="docutils literal"><span class="pre">None</span></tt> to represent no nodes on that portion of the loop.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">loop</span><span class="p">(</span><span class="s">&#39;forward&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_loop_none.png" src="_images/syntax_loop_none.png" />
+</div>
+<div class="section" id="toploop">
+<h3>toploop<a class="headerlink" href="#toploop" title="Permalink to this headline">¶</a></h3>
+<p>A <tt class="docutils literal"><span class="pre">toploop()</span></tt> is a variant of <tt class="docutils literal"><span class="pre">loop()</span></tt> that places the backward path above the forward path.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">toploop</span><span class="p">(</span><span class="n">line</span><span class="p">(</span><span class="s">&#39;(&#39;</span><span class="p">,</span> <span class="s">&#39;forward&#39;</span><span class="p">,</span> <span class="s">&#39;)&#39;</span><span class="p">),</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;)&#39;</span><span class="p">,</span> <span class="s">&#39;backward&#39;</span><span class="p">,</span> <span class="s">&#39;(&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_toploop.png" src="_images/syntax_toploop.png" />
+</div>
+<div class="section" id="choice">
+<h3>choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">choice()</span></tt> element represents a branch between multiple syntax options.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">choice</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_choice.png" src="_images/syntax_choice.png" />
+</div>
+<div class="section" id="opt">
+<h3>opt<a class="headerlink" href="#opt" title="Permalink to this headline">¶</a></h3>
+<p>An <tt class="docutils literal"><span class="pre">opt()</span></tt> element specifies an optional portion of the syntax. The main path bypasses the optional portion positioned below.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">opt</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_opt.png" src="_images/syntax_opt.png" />
+<p><tt class="docutils literal"><span class="pre">opt()</span></tt> is a special case of the <tt class="docutils literal"><span class="pre">choice()</span></tt> function where the first choice is <tt class="docutils literal"><span class="pre">None</span></tt> and the remaining nodes are put into a single line for the second choice. The example above is equivalent the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">choice</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="optx">
+<h3>optx<a class="headerlink" href="#optx" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">optx()</span></tt> element is a variant of <tt class="docutils literal"><span class="pre">opt()</span></tt> with the main path passing through the nodes.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">optx</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_optx.png" src="_images/syntax_optx.png" />
+</div>
+<div class="section" id="stack">
+<h3>stack<a class="headerlink" href="#stack" title="Permalink to this headline">¶</a></h3>
+<p>The elements described above will concatenate indefinitely from left to right. To break up long sections of a diagram you use the <tt class="docutils literal"><span class="pre">stack()</span></tt> element. Each of its arguments forms a separate line that is stacked from top to bottom.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stack</span><span class="p">(</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">),</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_stack.png" src="_images/syntax_stack.png" />
+<p>When an inner element of a stack argument list is an <tt class="docutils literal"><span class="pre">opt()</span></tt> or an <tt class="docutils literal"><span class="pre">optx()</span></tt> it will be rendered with a special vertical bypass.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stack</span><span class="p">(</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">),</span>
+  <span class="n">opt</span><span class="p">(</span><span class="s">&#39;bypass&#39;</span><span class="p">),</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;finish&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_bypass.png" src="_images/syntax_bypass.png" />
+</div>
+<div class="section" id="indentstack">
+<h3>indentstack<a class="headerlink" href="#indentstack" title="Permalink to this headline">¶</a></h3>
+<p>For more control of the stacking you can use the <tt class="docutils literal"><span class="pre">indentstack()</span></tt> element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
+For more control of the stacking you can use the <tt class="docutils literal"><span class="pre">indentstack()</span></tt> element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">indentstack</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">),</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_indentstack.png" src="_images/syntax_indentstack.png" />
+</div>
+<div class="section" id="rightstack">
+<h3>rightstack<a class="headerlink" href="#rightstack" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">rightstack</span><span class="p">(</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">,</span> <span class="s">&#39;with&#39;</span><span class="p">,</span> <span class="s">&#39;more&#39;</span><span class="p">,</span> <span class="s">&#39;code&#39;</span><span class="p">),</span>
+  <span class="n">line</span><span class="p">(</span><span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/syntax_rightstack.png" src="_images/syntax_rightstack.png" />
+</div>
+</div>
+<div class="section" id="ini-configuration">
+<h2>INI configuration<a class="headerlink" href="#ini-configuration" title="Permalink to this headline">¶</a></h2>
+<p>You can control the styling of the generated diagrams by passing in a style INI file with the <tt class="docutils literal"><span class="pre">-s</span></tt> option. By default Syntrax will look for a file names &#8220;syntrax.ini&#8221; in the current directory and use that if it exists.</p>
+<div class="highlight-python"><div class="highlight"><pre>[style]
+line_width = 2
+bubble_width = 2
+padding = 5
+line_color = (0,0,0)
+arrows = True
+bullet_fill = &#39;white&#39;        ; Requires optional webcolors package to be installed
+symbol_fill = &#39;#B3E5FC&#39;
+bubble_fill = (144,164,174)
+text_color = (0,0,0)
+shadow = True
+shadow_fill = (0,0,0,127)
+token_font = [&#39;Helvetica&#39;, 16, &#39;bold&#39;]
+bubble_font = [&#39;Helvetica&#39;, 14, &#39;bold&#39;]
+box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
+</pre></div>
+</div>
+<p>The style configuration file has a single section named &#8220;[style]&#8221;. It contains the following keys:</p>
+<blockquote>
+<div><p>line_width</p>
+<blockquote>
+<div>Connecting line width in pixels. Default is 2.</div></blockquote>
+<p>bubble_width</p>
+<blockquote>
+<div>Bubble outline width in pixels. Default is 2</div></blockquote>
+<p>padding</p>
+<blockquote>
+<div>Additional padding around each edge of the image in pixels. Default is 5.</div></blockquote>
+<p>line_color</p>
+<blockquote>
+<div>Color of the connecting lines and bubble outlines. Default is (0,0,0) Black.</div></blockquote>
+<p>arrows</p>
+<blockquote>
+<div>Boolean used to control rendering of line arrows. Default is True.</div></blockquote>
+<p>bullet_fill</p>
+<blockquote>
+<div>Fill color for small bullets at start and end of the diagram.</div></blockquote>
+<p>symbol_fill</p>
+<blockquote>
+<div>Fill color for boxed nodes.</div></blockquote>
+<p>bubble_fill</p>
+<blockquote>
+<div>Fill color for bubble nodes.</div></blockquote>
+<p>text_color</p>
+<blockquote>
+<div>Color of all text.</div></blockquote>
+<p>shadow</p>
+<blockquote>
+<div>Boolean controlling the rendering of bubble shadows. Default is False</div></blockquote>
+<p>shadow_fill</p>
+<blockquote>
+<div>Fill color for shadows.</div></blockquote>
+<p>token_font</p>
+<blockquote>
+<div>Font for bubble nodes of single character tokens.</div></blockquote>
+<p>bubble_font</p>
+<blockquote>
+<div>Font for bubble nodes.</div></blockquote>
+<p>box_font</p>
+<blockquote>
+<div>Font for boxed nodes.</div></blockquote>
+<p>title_font</p>
+<blockquote>
+<div>Font for image title.</div></blockquote>
+</div></blockquote>
+<div class="section" id="colors">
+<h3>Colors<a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h3>
+<p>The various keys controlling coloration can use a variety of color formats. The primary color representation is a 3 or 4-tuple representing RGB or RGBA channels. All channels are an integer ranging from 0 to 255. If you have the optional <a class="reference external" href="http://pypi.python.org/pypi/webcolors/">webcolors</a> package installed you can use color names as a value.</p>
+</div>
+<div class="section" id="fonts">
+<h3>Fonts<a class="headerlink" href="#fonts" title="Permalink to this headline">¶</a></h3>
+<p>Fonts are specified as a list of three items in the following order:</p>
+<ul class="simple">
+<li>Font family (Helvetica, Times, Courrier, etc.)</li>
+<li>Point size (12, 14, 16, etc.)</li>
+<li>Style (&#8216;normal&#8217;, &#8216;bold&#8217;, &#8216;italic&#8217;)</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bubble_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="hyperlinked-svg">
+<h2>Hyperlinked SVG<a class="headerlink" href="#hyperlinked-svg" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/syntrax_icon.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="#">Syntrax</a></h1>
+
+
+
+<p class="blurb">Railroad diagram generator</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=kevinpt&repo=syntrax&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+<div id="download_links">
+  <div class="js-clone-url clone-url open" data-protocol-type="http">
+    <span>Git clone URL:</span>
+    <div>
+      <input type="text" value="https://github.com/kevinpt/syntrax.git"
+             onclick="this.focus();this.select()" readonly="readonly" aria-label="Git clone URL">
+    </div>
+  </div>
+  <br>
+</div><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Syntrax</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#licensing">Licensing</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#using-syntrax">Using Syntrax</a></li>
+<li><a class="reference internal" href="#specification-language">Specification language</a><ul>
+<li><a class="reference internal" href="#line">line</a></li>
+<li><a class="reference internal" href="#loop">loop</a></li>
+<li><a class="reference internal" href="#toploop">toploop</a></li>
+<li><a class="reference internal" href="#choice">choice</a></li>
+<li><a class="reference internal" href="#opt">opt</a></li>
+<li><a class="reference internal" href="#optx">optx</a></li>
+<li><a class="reference internal" href="#stack">stack</a></li>
+<li><a class="reference internal" href="#indentstack">indentstack</a></li>
+<li><a class="reference internal" href="#rightstack">rightstack</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ini-configuration">INI configuration</a><ul>
+<li><a class="reference internal" href="#colors">Colors</a></li>
+<li><a class="reference internal" href="#fonts">Fonts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hyperlinked-svg">Hyperlinked SVG</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+<h3>Other projects</h3>
+
+<div id="proj_list">
+<p>
+<a href="http://kevinpt.github.io/opbasm/">Opbasm</a><br>
+<a href="http://kevinpt.github.io/ripyl/">Ripyl</a><br>
+<a href="http://code.google.com/p/vertcl">Vertcl</a><br>
+<a href="http://code.google.com/p/vhdl-extras">Vhdl-extras</a><br>
+<a href="http://kevinpt.github.io/lecroy-colorizer/">Lecroy-colorizer</a>
+</p>
+</div>
+
+<script>
+$(function() { // Retrieve list of repositories from Github and dynamically insert them into sidebar
+
+if(!window.sessionStorage || !JSON) { return; } // Punt on crusty browsers (looking at you IE10)
+
+function JSONP( url, callback ) {
+	var id = ( 'jsonp' + Math.random() * new Date() ).replace('.', '');
+	var script = document.createElement('script');
+	script.src = url.replace( 'callback=?', 'callback=' + id );
+	document.body.appendChild( script );
+	window[ id ] = function( data ) {
+		if (callback) {
+			callback( data );
+		}
+	};
+}
+
+// Build dictionary indexing lower cased project names with their preferred format
+var knownProjects = ["VHDL-extras", "Ripyl", "VerTcl", "LeCroy-colorizer", "Opbasm"];
+var projectDict = {};
+$.each(knownProjects, function(index, v) {
+  projectDict[v.toLowerCase()] = v;
+});
+
+function insert_projects(projects) {
+    var links = [];
+    var cur_proj = "Syntrax".toLowerCase();
+    
+    $.each(projects, function(key, value) {
+      if(key != cur_proj) {
+        var title;
+        if(key in projectDict) {
+          title = projectDict[key];
+        } else { // Capitalize first char
+          title = key.replace(/^./, function(match) {return match.toUpperCase()});
+        }
+        links.push("<a href='"+ value +"'>" + title + "</a>");
+      }
+    });
+    
+    $("#proj_list").html("<p>"+ links.join("<br>") +"</p>");
+}
+
+var now = new Date().getTime();
+if(sessionStorage.KTcacheTime && now - sessionStorage.KTcacheTime < 5*60*1000 ) { // Use cached values (5 min. expiry)
+  insert_projects(JSON.parse(sessionStorage.KTprojects));
+} else { // Retrieve current projects
+  JSONP("https://api.github.com/users/kevinpt/repos?type=owner&callback=?", function(response) {
+    var projects = {};
+    $.each(response.data, function(index, value) {
+      if(!value.fork)
+        projects[value.name] = value.homepage;
+    });
+    
+    insert_projects(projects);
+    
+    // Store data in session cache
+    sessionStorage.KTprojects = JSON.stringify(projects);
+    var now = new Date().getTime();
+    sessionStorage.KTcacheTime = now;
+  });  
+}
+
+});
+</script>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy;2016, Kevin Thibedeau.
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-82094459-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>
