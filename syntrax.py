@@ -83,6 +83,7 @@ class DrawStyle(object):
     self.bubble_width = 2
     self.padding = 5
     self.arrows = True
+    self.title_pos = 'tl'
     self.bullet_fill = (255,255,255)
     self.symbol_fill = (179,229,252)
     self.bubble_fill = (144,164,174)
@@ -155,6 +156,19 @@ def parse_style_config(fname):
   if sname in cp.sections():
     for opt in cp.options(sname):
       styles[opt] = ast.literal_eval(cp.get(sname, opt))
+
+
+  # Simplify title position
+  if 'title_pos' in styles:
+    pos = styles['title_pos'].lower()
+    pos = pos.replace('top', 't')
+    pos = pos.replace('bottom', 'b')
+    pos = pos.replace('left', 'l')
+    pos = pos.replace('right', 'r')
+    pos = pos.replace('center', 'c')
+    pos = pos.replace('-', '')
+    pos = pos.replace(' ', '')
+    styles['title_pos'] = pos
 
   return DrawStyle(styles)
 
@@ -1551,15 +1565,21 @@ def render_railroad(spec, title, url_map, out_file, backend, styles, scale, tran
   layout.draw_diagram(spec)
 
   if title is not None: # Add title
-    x0,y0,x1,y1 = rc.bbox('all')
+    pos = styles.title_pos
 
-    tid = rc.create_text(x0, y0, anchor='l', text=title, font=styles.title_font,
+    x0,y0,x1,y1 = rc.bbox('all')
+    
+    tid = rc.create_text(0, 0, anchor='l', text=title, font=styles.title_font,
       font_name='title_font')
 
     tx0, ty0, tx1, ty1 = rc.bbox(tid)
     h = ty1 - ty0
+    w = tx1 - tx0
+    
+    mx = x0 if 'l' in pos else (x1 + x0 - w) / 2  if 'c' in pos else x0 + x1 - w
+    my = (y0 - h - styles.padding) if 't' in pos else (y1 - y0 - styles.padding)
 
-    rc.move(tid, 0, -(h + styles.padding))
+    rc.move(tid, mx, my)
 
   x0,y0,x1,y1 = rc.bbox('all')
 
