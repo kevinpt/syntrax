@@ -33,12 +33,6 @@ except ImportError:
 
 __version__ = '0.9'
 
-RADIUS = 9
-HSEP = 17
-VSEP = 9
-DPI = 80
-
-
 def cairo_font(tk_font):
   family, size, weight = tk_font
   return pango.FontDescription('{} {} {}'.format(family, weight, size))
@@ -82,18 +76,21 @@ class DrawStyle(object):
     self.line_color = (0,0,0)
     self.bubble_width = 2
     self.padding = 5
+    self.max_radius = 9
+    self.h_sep = 17
+    self.v_sep = 9
     self.arrows = True
     self.title_pos = 'tl'
     self.bullet_fill = (255,255,255)
     self.symbol_fill = (179,229,252)
     self.bubble_fill = (144,164,174)
     self.text_color = (0,0,0)
-    self.shadow = False
+    self.shadow = True
     self.shadow_fill = (0,0,0, 127)
     self.token_font = ['Helvetica', 16, 'bold']
     self.bubble_font = ['Helvetica', 14, 'bold']
     self.box_font = ['Times', 14, 'italic']
-    self.title_font = ['Helvetica', 24, 'bold']
+    self.title_font = ['Helvetica', 22, 'bold']
 
     # Load any styles
     if styles is None:
@@ -914,16 +911,16 @@ class RailroadLayout(object):
     # Ensure y0 < y1
     y0, y1 = (min(y0,y1), max(y0,y1))
 
-    #if y0 + 2*RADIUS < y1:  # Two bends
-    #print('## RT:', y1, y0, y1-y0, 5*RADIUS)
-    if y1 - y0 > 3*RADIUS: # Two bends
-      xr0 = x - RADIUS
-      xr1 = x + RADIUS
+    #if y0 + 2*s.max_radius < y1:  # Two bends
+    #print('## RT:', y1, y0, y1-y0, 5*s.max_radius)
+    if y1 - y0 > 3*s.max_radius: # Two bends
+      xr0 = x - s.max_radius
+      xr1 = x + s.max_radius
       # Top curve
-      c.create_arc(xr0,y0,xr1,y0+2*RADIUS, width=s.line_width, start=90, extent=-90, tags=(tag,), style='arc')
-      yr0 = y0 + RADIUS
-      yr1 = y1 - RADIUS
-      if abs(yr1-yr0) > RADIUS*2: # Two line segments with arrow in middle
+      c.create_arc(xr0,y0,xr1,y0+2*s.max_radius, width=s.line_width, start=90, extent=-90, tags=(tag,), style='arc')
+      yr0 = y0 + s.max_radius
+      yr1 = y1 - s.max_radius
+      if abs(yr1-yr0) > s.max_radius*2: # Two line segments with arrow in middle
         half_y = (yr1 + yr0) / 2
         if flow == 'down':
           c.create_line(xr1,yr0,xr1,half_y, width=s.line_width, tags=(tag,), arrow='last')
@@ -935,7 +932,7 @@ class RailroadLayout(object):
       else: # No arrow
         c.create_line(xr1,yr0,xr1,yr1, width=s.line_width, tags=(tag,))
       # Bottom curve
-      c.create_arc(xr0,y1-2*RADIUS,xr1,y1, width=s.line_width, start=0, extent=-90, tags=(tag,), style='arc')
+      c.create_arc(xr0,y1-2*s.max_radius,xr1,y1, width=s.line_width, start=0, extent=-90, tags=(tag,), style='arc')
     else: # Single arc turnback
       r = (y1 - y0) / 2
       x0 = x - r
@@ -949,15 +946,15 @@ class RailroadLayout(object):
     # Ensure y0 < y1
     y0, y1 = (min(y0,y1), max(y0,y1))
     
-    #if y0 + 2*RADIUS < y1: # Two bends
-    if y1 - y0 > 3*RADIUS: # Two bends
-      xr0 = x - RADIUS
-      xr1 = x + RADIUS
+    #if y0 + 2*s.max_radius < y1: # Two bends
+    if y1 - y0 > 3*s.max_radius: # Two bends
+      xr0 = x - s.max_radius
+      xr1 = x + s.max_radius
       # Top curve
-      c.create_arc(xr0,y0,xr1,y0+2*RADIUS, width=s.line_width, start=90, extent=90, tags=(tag,), style='arc')
-      yr0 = y0 + RADIUS
-      yr1 = y1 - RADIUS
-      if abs(yr1-yr0) > RADIUS*2:
+      c.create_arc(xr0,y0,xr1,y0+2*s.max_radius, width=s.line_width, start=90, extent=90, tags=(tag,), style='arc')
+      yr0 = y0 + s.max_radius
+      yr1 = y1 - s.max_radius
+      if abs(yr1-yr0) > s.max_radius*2:
         half_y = (yr1 + yr0) / 2
         if flow == 'down':
           c.create_line(xr0,yr0,xr0,half_y, width=s.line_width, tags=(tag,), arrow='last')
@@ -969,7 +966,7 @@ class RailroadLayout(object):
         c.create_line(xr0,yr0,xr0,yr1, width=s.line_width, tags=(tag,))
         
       # Bottom curve
-      c.create_arc(xr0,y1-2*RADIUS,xr1,y1, width=s.line_width, start=180, extent=90, tags=(tag,), style='arc')
+      c.create_arc(xr0,y1-2*s.max_radius,xr1,y1, width=s.line_width, start=180, extent=90, tags=(tag,), style='arc')
     else: # Single arc turnback
       r = (y1 - y0) / 2
       x0 = x - r
@@ -1097,7 +1094,7 @@ class RailroadLayout(object):
     c = self.canvas
     s = self.style
     
-    sep = HSEP
+    sep = s.h_sep
     exx = 0
     exy = 0
     
@@ -1130,7 +1127,7 @@ class RailroadLayout(object):
     c = self.canvas
     s = self.style
     
-    sep = HSEP
+    sep = s.h_sep
     exx = 0 # Prev element end point
     exy = 0
     
@@ -1164,7 +1161,7 @@ class RailroadLayout(object):
     c = self.canvas
     s = self.style
     
-    sep = VSEP * 2
+    sep = s.v_sep * 2
     btm = 0
     n = len(lx)
     i = 0
@@ -1190,7 +1187,7 @@ class RailroadLayout(object):
       else:
         enter_y = btm - ty0 + sep*2 + 2
         if bypass:
-          next_bypass_y = enter_y - RADIUS
+          next_bypass_y = enter_y - s.max_radius
         if indent < 0: # rightstack
           w = tx1 - tx0
           enter_x = exit_x - w + sep*indent
@@ -1203,10 +1200,10 @@ class RailroadLayout(object):
         back_y = btm + sep + 1
         
         if bypass_y > 0:
-          mid_y = (bypass_y + RADIUS + back_y) / 2
+          mid_y = (bypass_y + s.max_radius + back_y) / 2
           c.create_line(bypass_x, bypass_y, bypass_x, mid_y, \
             width=s.line_width, tags=(tag,), arrow='last')
-          c.create_line(bypass_x, mid_y, bypass_x, back_y+RADIUS, \
+          c.create_line(bypass_x, mid_y, bypass_x, back_y+s.max_radius, \
             width=s.line_width, tags=(tag,))
             
         c.move(t, enter_x, enter_y)
@@ -1215,7 +1212,7 @@ class RailroadLayout(object):
           width=s.line_width, tags=(tag,))
         self.draw_right_turnback(tag, e2, exit_y, back_y)
         e3 = enter_x - sep
-        bypass_x = e3 - RADIUS
+        bypass_x = e3 - s.max_radius
         emid = (e2+e3)/2
         c.create_line(e2, back_y, emid, back_y, \
           width=s.line_width, tags=(tag,), arrow='last')
@@ -1235,25 +1232,25 @@ class RailroadLayout(object):
 
     if bypass:
       fwd_y = btm + sep + 1
-      mid_y = (next_bypass_y + RADIUS + fwd_y) / 2
-      descender_x = exit_x + RADIUS
+      mid_y = (next_bypass_y + s.max_radius + fwd_y) / 2
+      descender_x = exit_x + s.max_radius
       c.create_line(bypass_x, next_bypass_y, bypass_x, mid_y, \
         width=s.line_width, tags=(tag,), arrow='last')
-      c.create_line(bypass_x, mid_y, bypass_x, fwd_y-RADIUS, \
+      c.create_line(bypass_x, mid_y, bypass_x, fwd_y-s.max_radius, \
         width=s.line_width, tags=(tag,))
-      c.create_arc(bypass_x, fwd_y - 2*RADIUS, bypass_x + 2*RADIUS, fwd_y, \
+      c.create_arc(bypass_x, fwd_y - 2*s.max_radius, bypass_x + 2*s.max_radius, fwd_y, \
         width=s.line_width, start=180, extent=90, tags=(tag,), style='arc')
-      c.create_arc(exit_x - RADIUS, exit_y, descender_x, exit_y + 2*RADIUS, \
+      c.create_arc(exit_x - s.max_radius, exit_y, descender_x, exit_y + 2*s.max_radius, \
         width=s.line_width, start=90, extent=-90, tags=(tag,), style='arc')
-      c.create_arc(descender_x, fwd_y - 2*RADIUS, descender_x + 2*RADIUS, fwd_y, \
+      c.create_arc(descender_x, fwd_y - 2*s.max_radius, descender_x + 2*s.max_radius, fwd_y, \
         width=s.line_width, start=180, extent=90, tags=(tag,), style='arc')
-      exit_x = exit_x + 2*RADIUS
+      exit_x = exit_x + 2*s.max_radius
       half_x = (exit_x + indent) / 2
-      c.create_line(bypass_x + RADIUS, fwd_y, half_x, fwd_y, \
+      c.create_line(bypass_x + s.max_radius, fwd_y, half_x, fwd_y, \
         width=s.line_width, tags=(tag,), arrow='last')
       c.create_line(halfx_, fwd_y, exit_x, fwd_y, \
         width=s.line_width, tags=(tag,))
-      c.create_line(descender_x, exit_y+RADIUS, descender_x, fwd_y-RADIUS, \
+      c.create_line(descender_x, exit_y+s.max_radius, descender_x, fwd_y-s.max_radius, \
         width=s.line_width, tags=(tag,), arrow='last')
       exit_y = fwd_y      
       
@@ -1266,8 +1263,8 @@ class RailroadLayout(object):
     c = self.canvas
     s = self.style
     
-    sep = HSEP
-    vsep = VSEP
+    sep = s.h_sep
+    vsep = s.v_sep
     
 
     if isinstance(back, basestring) or back is None:
@@ -1339,7 +1336,7 @@ class RailroadLayout(object):
     self.draw_left_turnback(tag, sep, 0, biny, 'up')
     self.draw_right_turnback(tag, mxx, fexy, bexy, 'down')
     #x0, y0, x1, y1 = c.bbox(tag) # Bounds for the entire loop
-    exit_x = mxx + RADIUS # Add radius of right turnback to get full width
+    exit_x = mxx + s.max_radius # Add radius of right turnback to get full width
     c.create_line(mxx,fexy,exit_x,fexy, width=s.line_width, tags=(tag,)) # Feed out line above right turnback
     
     return [tag, exit_x, fexy]
@@ -1349,7 +1346,7 @@ class RailroadLayout(object):
     c = self.canvas
     s = self.style
     
-    sep = VSEP
+    sep = s.v_sep
     vsep = sep / 2 # Tighten spacing for top loops
 
     if isinstance(back, basestring) or back is None:
@@ -1411,7 +1408,7 @@ class RailroadLayout(object):
     c = self.canvas
     s = self.style
 
-    sep = VSEP
+    sep = s.v_sep
     vsep = sep / 2
     
     n = len(lx)
@@ -1497,7 +1494,7 @@ class RailroadLayout(object):
       elif spec[0] == 'stack':
         return self.draw_stack(0, spec[1:])
       elif spec[0] == 'indentstack':
-        hsep = HSEP * spec[1]
+        hsep = s.h_sep * spec[1]
         return self.draw_stack(hsep, spec[2:])
       elif spec[0] == 'rightstack':
         return self.draw_stack(-1, spec[1:])
@@ -1748,15 +1745,19 @@ def dump_style_ini(ini_file):
     'bubble_width',
     'padding',
     'line_color',
+    'max_radius',
+    'h_sep',
+    'v_sep',
     'arrows',
+    'title_pos',
     'bullet_fill',
     'symbol_fill',
     'bubble_fill',
     'text_color',
     'shadow',
     'shadow_fill',
-    'token_font',
     'bubble_font',
+    'token_font',
     'box_font',
     'title_font')
 
