@@ -180,7 +180,6 @@ class BaseShape(object):
     x1 = self._bbox[2] + w
     y1 = self._bbox[3] + w
     return (x0,y0,x1,y1)
-    #return tuple(self._bbox)
 
   def is_tagged(self, item):
     return item in self.tags
@@ -190,16 +189,11 @@ class BaseShape(object):
       self.tags = self.tags.union(self.options['tags'])
       del self.options['tags']
 
-
-#  def bbox(self):
-#    return tuple(self._bbox)
-
   def move(self, dx, dy):
     self._bbox[0] += dx
     self._bbox[1] += dy
     self._bbox[2] += dx
     self._bbox[3] += dy
-    #print('## MOVE:', self._bbox)
 
   def dtag(self, tag=None):
     if tag is None:
@@ -227,7 +221,6 @@ class RectShape(BaseShape):
     BaseShape.__init__(self)
     self.options = options
     self._bbox = [x0, y0, x1, y1]
-    #print('$$ RECT', self._bbox)
     self.update_tags()
 
 
@@ -236,7 +229,6 @@ class OvalShape(BaseShape):
     BaseShape.__init__(self)
     self.options = options
     self._bbox = [x0, y0, x1, y1]
-    #print('!! DRAW: Oval', self._bbox)
     self.update_tags()
 
 class ArcShape(BaseShape):
@@ -648,6 +640,9 @@ def svg_draw_shape(shape, fh, styles):
 
   elif isinstance(shape, LineShape):
     x0, y0, x1, y1 = shape.points
+
+    # We don't need a fill attribute for lines
+    del attrs['fill']
 
     attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
 
