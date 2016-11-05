@@ -49,6 +49,9 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
+gh-pages: html
+	cp -r $(BUILDDIR)/html/* ../../syntrax-html
+
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
