@@ -473,7 +473,7 @@ Fonts
 
 Fonts are specified as a list of three items in the following order:
 
-* Font family (Helvetica, Times, Courrier, etc.)
+* Font family (Helvetica, Times, Courier, etc.)
 * Point size (12, 14, 16, etc.)
 * Style ('normal', 'bold', 'italic')
 
@@ -507,6 +507,12 @@ SVG images can have hyperlinked bubble text. This is implemented by adding a ``u
 
   <object type="image/svg+xml" data="_images/vhdl_attribute_linked.svg"></object>
 
+
+Current browser policies lump SVG hyperlinks together with embedded Javascript. Because of this they do not support hyperlinks when an SVG is referenced through an HTML ``<img>`` tag. To get functional links on a web page you must use an ``<object>`` tag instead:
+
+.. code-block:: html
+
+  <object type="image/svg+xml" data="path/to/your.svg"></object>
 
 .. toctree::
    :maxdepth: 1
