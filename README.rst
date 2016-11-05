@@ -26,7 +26,7 @@ JSON number syntax
 
 Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have `hyperlinked text <http://kevinpt.github.io/syntrax/index.html#hyperlinked-text>`_ allowing users to quickly navigate to documentation of different syntax elements.
 
-Syntrax is a heaviliy modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
+Syntrax is a heavily modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
 
 
 

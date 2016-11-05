@@ -31,14 +31,14 @@ width="175" height="50" version="1.1">
 <circle cx="9" cy="21.0" r="3" stroke="#000000" stroke-width="2" fill="#FFFFFF"/>
 <path d="M63.0,38.0 A16.0,16.0 0 0,1 63.0,6.0 H120.0 A16.0,16.0 0 0,1 120.0,38.0 z" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
 <text class="bubble_font" x="91.5" y="29.0">forward</text>
-<line x1="90.0" y1="44.0" x2="91.0" y2="44.0" stroke="#000000" stroke-width="2" fill="#fff" />
-<line x1="46" y1="44.0" x2="90.0" y2="44.0" stroke="#000000" stroke-width="2" fill="#fff" />
-<line x1="137.0" y1="44.0" x2="95.0" y2="44.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
-<line x1="29" y1="21.0" x2="46" y2="21.0" stroke="#000000" stroke-width="2" fill="#fff" />
+<line x1="90.0" y1="44.0" x2="91.0" y2="44.0" stroke="#000000" stroke-width="2" />
+<line x1="46" y1="44.0" x2="90.0" y2="44.0" stroke="#000000" stroke-width="2" />
+<line x1="137.0" y1="44.0" x2="95.0" y2="44.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<line x1="29" y1="21.0" x2="46" y2="21.0" stroke="#000000" stroke-width="2" />
 <path d="M46.0,21.0 A11.5,11.5 0 0,0 46.0,44.0" stroke="#000000" stroke-width="2" fill="none"/>
 <path d="M137.0,44.0 A11.5,11.5 0 0,0 137.0,21.0" stroke="#000000" stroke-width="2" fill="none"/>
-<line x1="137.0" y1="21.0" x2="146.0" y2="21.0" stroke="#000000" stroke-width="2" fill="#fff" />
-<line x1="11" y1="21.0" x2="25.0" y2="21.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="137.0" y1="21.0" x2="146.0" y2="21.0" stroke="#000000" stroke-width="2" />
+<line x1="11" y1="21.0" x2="25.0" y2="21.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 <circle cx="166.0" cy="21.0" r="3.0" stroke="#000000" stroke-width="2" fill="#FFFFFF"/>
-<line x1="145.0" y1="21.0" x2="159.0" y2="21.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="145.0" y1="21.0" x2="159.0" y2="21.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 </svg>

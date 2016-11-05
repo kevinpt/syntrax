@@ -25,7 +25,7 @@ This is processed by Syntrax to generate an SVG image:
 
 Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have `hyperlinked text`_ allowing users to quickly navigate to documentation of different syntax elements.
 
-Syntrax is a heaviliy modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
+Syntrax is a heavily modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
 
 
 
@@ -294,7 +294,6 @@ indentstack
 ~~~~~~~~~~~
 
 For more control of the stacking you can use the ``indentstack()`` element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
-For more control of the stacking you can use the ``indentstack()`` element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
 
 .. code-block:: python
 
@@ -307,6 +306,8 @@ For more control of the stacking you can use the ``indentstack()`` element. It s
 
 rightstack
 ~~~~~~~~~~
+
+The ``rightstack()`` element will right align successive lines without needing to determine the indentation.
 
 .. code-block:: python
 
@@ -505,7 +506,7 @@ SVG images can have hyperlinked bubble text. This is implemented by adding a ``u
 
 .. raw:: html
 
-  <object type="image/svg+xml" data="_images/vhdl_attribute_linked.svg"></object>
+  <object type="image/svg+xml" data="_static/vhdl_attribute_linked.svg"></object>
 
 
 Current browser policies lump SVG hyperlinks together with embedded Javascript. Because of this they do not support hyperlinks when an SVG is referenced through an HTML ``<img>`` tag. To get functional links on a web page you must use an ``<object>`` tag instead:
