@@ -15,7 +15,7 @@ The specification is a set of nested Python function calls:
     line(opt(choice('e', 'E'), choice(None, '+', '-'), loop('0-9', None)))
   )
 
-This is processed to generate an SVG image:
+This is processed by Syntrax to generate an SVG image:
 
 .. figure:: images/json_number.svg
   :align: center
@@ -23,7 +23,7 @@ This is processed to generate an SVG image:
   JSON number syntax
 
 
-Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have hyperlinked text allowing users to quickly navigate to documentation of different syntax elements.
+Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have `hyperlinked text`_ allowing users to quickly navigate to documentation of different syntax elements.
 
 Syntrax is a heaviliy modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
 
@@ -141,10 +141,28 @@ You can specify the specific out file you want with the ``-o`` option. The exten
   > syntrax -i foo.spec -o eps
   Rendering to foo.eps using cairo backend
 
+Transparency
+~~~~~~~~~~~~
 
 By default the images have a white background. If you want a transparent background pass the ``-t`` option.
 
-You can control the scale of the resulting image with the ``--scale`` option. It takes a floating point scale factor. This is most useful for the PNG output.
+Scaling
+~~~~~~~
+
+You can control the scale of the resulting image with the ``--scale`` option. It takes a floating point scale factor. This is most useful for the PNG output to increase the resolution of the image or create thumbnails with less blurring than conventional bitmap resizing.
+
+.. parsed-literal::
+
+  > syntrax -i scaling.spec -o scale_small.png --scale 0.5
+
+.. image:: images/scale_small.png
+
+.. parsed-literal::
+
+  > syntrax -i scaling.spec -o scale_big.png --scale 2.0
+
+.. image:: images/scale_big.png
+
 
 Specification language
 ----------------------
@@ -170,7 +188,7 @@ A ``line()`` creates a series of nodes arranged horizontally from left to right.
   line('[', 'foo', ',', '/bar', ']')
 
 
-.. image:: images/syntax_line.png
+.. image:: images/syntax_line.svg
 
 loop
 ~~~~
@@ -182,7 +200,7 @@ A ``loop()`` represents a repeatable section of the syntax diagram. It takes two
   loop(line('/forward', 'path'), line('backward', 'path'))
 
 
-.. image:: images/syntax_loop.png
+.. image:: images/syntax_loop.svg
 
 Either the forward or backward path can be ``None`` to represent no nodes on that portion of the loop.
 
@@ -191,7 +209,7 @@ Either the forward or backward path can be ``None`` to represent no nodes on tha
   loop('forward', None)
 
 
-.. image:: images/syntax_loop_none.png
+.. image:: images/syntax_loop_none.svg
 
 
 toploop
@@ -203,7 +221,7 @@ A ``toploop()`` is a variant of ``loop()`` that places the backward path above t
 
   toploop(line('(', 'forward', ')'), line(')', 'backward', '('))
 
-.. image:: images/syntax_toploop.png
+.. image:: images/syntax_toploop.svg
 
 
 choice
@@ -215,7 +233,7 @@ The ``choice()`` element represents a branch between multiple syntax options.
 
   choice('A', 'B', 'C')
 
-.. image:: images/syntax_choice.png
+.. image:: images/syntax_choice.svg
 
 
 opt
@@ -227,7 +245,7 @@ An ``opt()`` element specifies an optional portion of the syntax. The main path 
 
   opt('A', 'B', 'C')
 
-.. image:: images/syntax_opt.png
+.. image:: images/syntax_opt.svg
 
 ``opt()`` is a special case of the ``choice()`` function where the first choice is ``None`` and the remaining nodes are put into a single line for the second choice. The example above is equivalent the following:
 
@@ -244,7 +262,7 @@ The ``optx()`` element is a variant of ``opt()`` with the main path passing thro
 
   optx('A', 'B', 'C')
 
-.. image:: images/syntax_optx.png
+.. image:: images/syntax_optx.svg
 
 stack
 ~~~~~
@@ -258,7 +276,7 @@ The elements described above will concatenate indefinitely from left to right. T
     line('bottom', 'line')
   )
 
-.. image:: images/syntax_stack.png
+.. image:: images/syntax_stack.svg
 
 When an inner element of a stack argument list is an ``opt()`` or an ``optx()`` it will be rendered with a special vertical bypass.
 
@@ -270,7 +288,7 @@ When an inner element of a stack argument list is an ``opt()`` or an ``optx()`` 
     line('finish')
   )
 
-.. image:: images/syntax_bypass.png
+.. image:: images/syntax_bypass.svg
 
 indentstack
 ~~~~~~~~~~~
@@ -285,7 +303,7 @@ For more control of the stacking you can use the ``indentstack()`` element. It s
     line('bottom', 'line')
   )
 
-.. image:: images/syntax_indentstack.png
+.. image:: images/syntax_indentstack.svg
 
 rightstack
 ~~~~~~~~~~
@@ -297,12 +315,16 @@ rightstack
     line('bottom', 'line')
   )
 
-.. image:: images/syntax_rightstack.png
+.. image:: images/syntax_rightstack.svg
 
-INI configuration
------------------
+Styling diagrams
+----------------
 
-You can control the styling of the generated diagrams by passing in a style INI file with the ``-s`` option. By default Syntrax will look for a file names "syntrax.ini" in the current directory and use that if it exists.
+You can control the styling of the generated diagrams by passing in a style INI file with the ``-s`` option. By default Syntrax will look for a file named "syntrax.ini" in the current directory and use that if it exists. Otherwise it will fall back to its internal defaults.
+
+You can use the ``--get-style`` option to get a copy of the default styles in the current directory so you can quickly make modifications.
+
+Here is the default styling:
 
 .. parsed-literal::
 
@@ -312,15 +334,43 @@ You can control the styling of the generated diagrams by passing in a style INI 
   padding = 5
   line_color = (0,0,0)
   arrows = True
-  bullet_fill = 'white'        ; Requires optional webcolors package to be installed
+  bullet_fill = '#FFFFFF'
   symbol_fill = '#B3E5FC'
   bubble_fill = (144,164,174)
   text_color = (0,0,0)
   shadow = True
   shadow_fill = (0,0,0,127)
-  token_font = ['Helvetica', 16, 'bold']
   bubble_font = ['Helvetica', 14, 'bold']
+  token_font = ['Helvetica', 16, 'bold']
   box_font = ['Times', 14, 'italic']
+  
+.. image:: images/vhdl_attribute_spec.svg  
+
+
+Here is the same diagram with modified styling:
+
+.. parsed-literal::
+
+  [style]
+  line_width = 3               ; Thicker lines
+  bubble_width = 3
+  padding = 5
+  line_color = (0,0,0)
+  arrows = False               ; Remove arrows
+  bullet_fill = 'white'        ; Requires optional webcolors package to be installed
+  symbol_fill = (255,0,0,127)  ; Optional alpha component for transparent fills
+  bubble_fill = (110,150,250)
+  text_color = (0,0,0)
+  shadow = True
+  shadow_fill = (50,0,0,127)
+  bubble_font = ['Helvetica', 14, 'bold']
+  token_font = ['Times', 16, 'italic']
+  box_font = ['Helvetica', 14, 'normal']
+
+  
+.. image:: images/vhdl_attribute_alt.svg  
+  
+  
 
 The style configuration file has a single section named "[style]". It contains the following keys:
 
@@ -333,7 +383,7 @@ The style configuration file has a single section named "[style]". It contains t
   bubble_width
 
 
-    Bubble outline width in pixels. Default is 2
+    Bubble outline width in pixels. Default is 2.
 
 
   padding
@@ -381,40 +431,42 @@ The style configuration file has a single section named "[style]". It contains t
   shadow
 
 
-    Boolean controlling the rendering of bubble shadows. Default is False
+    Boolean controlling the rendering of bubble shadows. Default is True.
 
 
   shadow_fill
 
-
     Fill color for shadows.
-
-  token_font
-
-
-    Font for bubble nodes of single character tokens.
-
 
   bubble_font
 
-
     Font for bubble nodes.
+    
+  token_font
 
+    Font for bubble nodes of single character tokens.
 
   box_font
-
 
     Font for boxed nodes.
 
   title_font
-
 
     Font for image title.
 
 Colors
 ~~~~~~
 
-The various keys controlling coloration can use a variety of color formats. The primary color representation is a 3 or 4-tuple representing RGB or RGBA channels. All channels are an integer ranging from 0 to 255. If you have the optional `webcolors <http://pypi.python.org/pypi/webcolors/>`_ package installed you can use color names as a value.
+The various keys controlling coloration can use a variety of color formats. The primary color representation is a 3 or 4-tuple representing RGB or RGBA channels. All channels are an integer ranging from 0 to 255. You can also specify RGB colors as a hex string. If you have the optional `webcolors <http://pypi.python.org/pypi/webcolors/>`_ package installed you can use color names as a value.
+
+.. parsed-literal::
+
+  ; Supported color formats:
+  
+  (255,100,0)     ; RGB
+  (255,100,0,100) ; RGBA
+  '#AABBCC'       ; Hex string
+  'red'           ; Named web color (with optional package)
 
 Fonts
 ~~~~~
@@ -429,9 +481,31 @@ Fonts are specified as a list of three items in the following order:
 
   bubble_font = ['Helvetica', 14, 'bold']
 
+
+.. _hyperlinked text:
+
 Hyperlinked SVG
 ---------------
 
+SVG images can have hyperlinked bubble text. This is implemented by adding a ``url_map`` dictionary after the diagram specification. The keys of the dictionary are the text identifying the bubble and their values are the URL for the link. The text key should not include any leading "/" character for the box bubbles.
+
+.. code-block:: python
+
+  stack(
+   line('attribute', '/(attribute) identifier', 'of'),
+   line(choice(toploop('/entity_designator', ','), 'others', 'all'), ':'),
+   line('/entity_class', 'is', '/expression', ';')
+  )
+
+  url_map = {
+    'entity_class': 'https://www.google.com/#q=vhdl+entity+class',
+    '(attribute) identifier': 'http://en.wikipedia.com/wiki/VHDL'
+  }
+
+
+.. raw:: html
+
+  <object type="image/svg+xml" data="_images/vhdl_attribute_linked.svg"></object>
 
 
 .. toctree::

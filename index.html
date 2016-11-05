@@ -49,11 +49,11 @@
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>This is processed to generate an SVG image:</p>
+<p>This is processed by Syntrax to generate an SVG image:</p>
 <div class="figure align-center">
 <img src="_images/json_number.svg" /><p class="caption">JSON number syntax</p>
 </div>
-<p>Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have hyperlinked text allowing users to quickly navigate to documentation of different syntax elements.</p>
+<p>Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have <a class="reference internal" href="#hyperlinked-text">hyperlinked text</a> allowing users to quickly navigate to documentation of different syntax elements.</p>
 <p>Syntrax is a heaviliy modified version of the railroad diagram generator used for the <a class="reference external" href="https://www.sqlite.org/lang.html">SQLite documentation</a>. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.</p>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
@@ -137,8 +137,22 @@ Rendering to bar.pdf using cairo backend
 Rendering to foo.eps using cairo backend
 </pre></div>
 </div>
+<div class="section" id="transparency">
+<h3>Transparency<a class="headerlink" href="#transparency" title="Permalink to this headline">¶</a></h3>
 <p>By default the images have a white background. If you want a transparent background pass the <tt class="docutils literal"><span class="pre">-t</span></tt> option.</p>
-<p>You can control the scale of the resulting image with the <tt class="docutils literal"><span class="pre">--scale</span></tt> option. It takes a floating point scale factor. This is most useful for the PNG output.</p>
+</div>
+<div class="section" id="scaling">
+<h3>Scaling<a class="headerlink" href="#scaling" title="Permalink to this headline">¶</a></h3>
+<p>You can control the scale of the resulting image with the <tt class="docutils literal"><span class="pre">--scale</span></tt> option. It takes a floating point scale factor. This is most useful for the PNG output to increase the resolution of the image or create thumbnails with less blurring than conventional bitmap resizing.</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; syntrax -i scaling.spec -o scale_small.png --scale 0.5
+</pre></div>
+</div>
+<img alt="_images/scale_small.png" src="_images/scale_small.png" />
+<div class="highlight-python"><div class="highlight"><pre>&gt; syntrax -i scaling.spec -o scale_big.png --scale 2.0
+</pre></div>
+</div>
+<img alt="_images/scale_big.png" src="_images/scale_big.png" />
+</div>
 </div>
 <div class="section" id="specification-language">
 <h2>Specification language<a class="headerlink" href="#specification-language" title="Permalink to this headline">¶</a></h2>
@@ -171,45 +185,39 @@ Rendering to foo.eps using cairo backend
 <div class="highlight-python"><div class="highlight"><pre><span class="n">line</span><span class="p">(</span><span class="s">&#39;[&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;/bar&#39;</span><span class="p">,</span> <span class="s">&#39;]&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_line.png" src="_images/syntax_line.png" />
-</div>
+<img src="_images/syntax_line.svg" /></div>
 <div class="section" id="loop">
 <h3>loop<a class="headerlink" href="#loop" title="Permalink to this headline">¶</a></h3>
 <p>A <tt class="docutils literal"><span class="pre">loop()</span></tt> represents a repeatable section of the syntax diagram. It takes two arguments. The first is the line of nodes for the forward path and the second is the nodes for the backward path. The backward path is rendered with nodes ordered from right to left.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">loop</span><span class="p">(</span><span class="n">line</span><span class="p">(</span><span class="s">&#39;/forward&#39;</span><span class="p">,</span> <span class="s">&#39;path&#39;</span><span class="p">),</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;backward&#39;</span><span class="p">,</span> <span class="s">&#39;path&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_loop.png" src="_images/syntax_loop.png" />
-<p>Either the forward or backward path can be <tt class="docutils literal"><span class="pre">None</span></tt> to represent no nodes on that portion of the loop.</p>
+<img src="_images/syntax_loop.svg" /><p>Either the forward or backward path can be <tt class="docutils literal"><span class="pre">None</span></tt> to represent no nodes on that portion of the loop.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">loop</span><span class="p">(</span><span class="s">&#39;forward&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_loop_none.png" src="_images/syntax_loop_none.png" />
-</div>
+<img src="_images/syntax_loop_none.svg" /></div>
 <div class="section" id="toploop">
 <h3>toploop<a class="headerlink" href="#toploop" title="Permalink to this headline">¶</a></h3>
 <p>A <tt class="docutils literal"><span class="pre">toploop()</span></tt> is a variant of <tt class="docutils literal"><span class="pre">loop()</span></tt> that places the backward path above the forward path.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">toploop</span><span class="p">(</span><span class="n">line</span><span class="p">(</span><span class="s">&#39;(&#39;</span><span class="p">,</span> <span class="s">&#39;forward&#39;</span><span class="p">,</span> <span class="s">&#39;)&#39;</span><span class="p">),</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;)&#39;</span><span class="p">,</span> <span class="s">&#39;backward&#39;</span><span class="p">,</span> <span class="s">&#39;(&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_toploop.png" src="_images/syntax_toploop.png" />
-</div>
+<img src="_images/syntax_toploop.svg" /></div>
 <div class="section" id="choice">
 <h3>choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h3>
 <p>The <tt class="docutils literal"><span class="pre">choice()</span></tt> element represents a branch between multiple syntax options.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">choice</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_choice.png" src="_images/syntax_choice.png" />
-</div>
+<img src="_images/syntax_choice.svg" /></div>
 <div class="section" id="opt">
 <h3>opt<a class="headerlink" href="#opt" title="Permalink to this headline">¶</a></h3>
 <p>An <tt class="docutils literal"><span class="pre">opt()</span></tt> element specifies an optional portion of the syntax. The main path bypasses the optional portion positioned below.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">opt</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_opt.png" src="_images/syntax_opt.png" />
-<p><tt class="docutils literal"><span class="pre">opt()</span></tt> is a special case of the <tt class="docutils literal"><span class="pre">choice()</span></tt> function where the first choice is <tt class="docutils literal"><span class="pre">None</span></tt> and the remaining nodes are put into a single line for the second choice. The example above is equivalent the following:</p>
+<img src="_images/syntax_opt.svg" /><p><tt class="docutils literal"><span class="pre">opt()</span></tt> is a special case of the <tt class="docutils literal"><span class="pre">choice()</span></tt> function where the first choice is <tt class="docutils literal"><span class="pre">None</span></tt> and the remaining nodes are put into a single line for the second choice. The example above is equivalent the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">choice</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -220,8 +228,7 @@ Rendering to foo.eps using cairo backend
 <div class="highlight-python"><div class="highlight"><pre><span class="n">optx</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_optx.png" src="_images/syntax_optx.png" />
-</div>
+<img src="_images/syntax_optx.svg" /></div>
 <div class="section" id="stack">
 <h3>stack<a class="headerlink" href="#stack" title="Permalink to this headline">¶</a></h3>
 <p>The elements described above will concatenate indefinitely from left to right. To break up long sections of a diagram you use the <tt class="docutils literal"><span class="pre">stack()</span></tt> element. Each of its arguments forms a separate line that is stacked from top to bottom.</p>
@@ -231,8 +238,7 @@ Rendering to foo.eps using cairo backend
 <span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_stack.png" src="_images/syntax_stack.png" />
-<p>When an inner element of a stack argument list is an <tt class="docutils literal"><span class="pre">opt()</span></tt> or an <tt class="docutils literal"><span class="pre">optx()</span></tt> it will be rendered with a special vertical bypass.</p>
+<img src="_images/syntax_stack.svg" /><p>When an inner element of a stack argument list is an <tt class="docutils literal"><span class="pre">opt()</span></tt> or an <tt class="docutils literal"><span class="pre">optx()</span></tt> it will be rendered with a special vertical bypass.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">stack</span><span class="p">(</span>
   <span class="n">line</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">),</span>
   <span class="n">opt</span><span class="p">(</span><span class="s">&#39;bypass&#39;</span><span class="p">),</span>
@@ -240,8 +246,7 @@ Rendering to foo.eps using cairo backend
 <span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_bypass.png" src="_images/syntax_bypass.png" />
-</div>
+<img src="_images/syntax_bypass.svg" /></div>
 <div class="section" id="indentstack">
 <h3>indentstack<a class="headerlink" href="#indentstack" title="Permalink to this headline">¶</a></h3>
 <p>For more control of the stacking you can use the <tt class="docutils literal"><span class="pre">indentstack()</span></tt> element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
@@ -252,8 +257,7 @@ For more control of the stacking you can use the <tt class="docutils literal"><s
 <span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_indentstack.png" src="_images/syntax_indentstack.png" />
-</div>
+<img src="_images/syntax_indentstack.svg" /></div>
 <div class="section" id="rightstack">
 <h3>rightstack<a class="headerlink" href="#rightstack" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">rightstack</span><span class="p">(</span>
@@ -262,37 +266,56 @@ For more control of the stacking you can use the <tt class="docutils literal"><s
 <span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/syntax_rightstack.png" src="_images/syntax_rightstack.png" />
+<img src="_images/syntax_rightstack.svg" /></div>
 </div>
-</div>
-<div class="section" id="ini-configuration">
-<h2>INI configuration<a class="headerlink" href="#ini-configuration" title="Permalink to this headline">¶</a></h2>
-<p>You can control the styling of the generated diagrams by passing in a style INI file with the <tt class="docutils literal"><span class="pre">-s</span></tt> option. By default Syntrax will look for a file names &#8220;syntrax.ini&#8221; in the current directory and use that if it exists.</p>
-<div class="highlight-python"><div class="highlight"><pre>[style]
-line_width = 2
-bubble_width = 2
-padding = 5
-line_color = (0,0,0)
-arrows = True
-bullet_fill = &#39;white&#39;        ; Requires optional webcolors package to be installed
-symbol_fill = &#39;#B3E5FC&#39;
-bubble_fill = (144,164,174)
-text_color = (0,0,0)
-shadow = True
-shadow_fill = (0,0,0,127)
-token_font = [&#39;Helvetica&#39;, 16, &#39;bold&#39;]
-bubble_font = [&#39;Helvetica&#39;, 14, &#39;bold&#39;]
-box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
+<div class="section" id="styling-diagrams">
+<h2>Styling diagrams<a class="headerlink" href="#styling-diagrams" title="Permalink to this headline">¶</a></h2>
+<p>You can control the styling of the generated diagrams by passing in a style INI file with the <tt class="docutils literal"><span class="pre">-s</span></tt> option. By default Syntrax will look for a file named &#8220;syntrax.ini&#8221; in the current directory and use that if it exists. Otherwise it will fall back to its internal defaults.</p>
+<p>You can use the <tt class="docutils literal"><span class="pre">--get-style</span></tt> option to get a copy of the default styles in the current directory so you can quickly make modifications.</p>
+<p>Here is the default styling:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">style</span><span class="p">]</span>
+<span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">bubble_width</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">padding</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">line_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">arrows</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">bullet_fill</span> <span class="o">=</span> <span class="s">&#39;#FFFFFF&#39;</span>
+<span class="n">symbol_fill</span> <span class="o">=</span> <span class="s">&#39;#B3E5FC&#39;</span>
+<span class="n">bubble_fill</span> <span class="o">=</span> <span class="p">(</span><span class="mi">144</span><span class="p">,</span><span class="mi">164</span><span class="p">,</span><span class="mi">174</span><span class="p">)</span>
+<span class="n">text_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">shadow</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">shadow_fill</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">127</span><span class="p">)</span>
+<span class="n">bubble_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">]</span>
+<span class="n">token_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">]</span>
+<span class="n">box_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Times&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;italic&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>The style configuration file has a single section named &#8220;[style]&#8221;. It contains the following keys:</p>
+<img src="_images/vhdl_attribute_spec.svg" /><p>Here is the same diagram with modified styling:</p>
+<div class="highlight-python"><div class="highlight"><pre>[style]
+line_width = 3               ; Thicker lines
+bubble_width = 3
+padding = 5
+line_color = (0,0,0)
+arrows = False               ; Remove arrows
+bullet_fill = &#39;white&#39;        ; Requires optional webcolors package to be installed
+symbol_fill = (255,0,0,127)  ; Optional alpha component for transparent fills
+bubble_fill = (110,150,250)
+text_color = (0,0,0)
+shadow = True
+shadow_fill = (50,0,0,127)
+bubble_font = [&#39;Helvetica&#39;, 14, &#39;bold&#39;]
+token_font = [&#39;Times&#39;, 16, &#39;italic&#39;]
+box_font = [&#39;Helvetica&#39;, 14, &#39;normal&#39;]
+</pre></div>
+</div>
+<img src="_images/vhdl_attribute_alt.svg" /><p>The style configuration file has a single section named &#8220;[style]&#8221;. It contains the following keys:</p>
 <blockquote>
 <div><p>line_width</p>
 <blockquote>
 <div>Connecting line width in pixels. Default is 2.</div></blockquote>
 <p>bubble_width</p>
 <blockquote>
-<div>Bubble outline width in pixels. Default is 2</div></blockquote>
+<div>Bubble outline width in pixels. Default is 2.</div></blockquote>
 <p>padding</p>
 <blockquote>
 <div>Additional padding around each edge of the image in pixels. Default is 5.</div></blockquote>
@@ -316,16 +339,16 @@ box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
 <div>Color of all text.</div></blockquote>
 <p>shadow</p>
 <blockquote>
-<div>Boolean controlling the rendering of bubble shadows. Default is False</div></blockquote>
+<div>Boolean controlling the rendering of bubble shadows. Default is True.</div></blockquote>
 <p>shadow_fill</p>
 <blockquote>
 <div>Fill color for shadows.</div></blockquote>
-<p>token_font</p>
-<blockquote>
-<div>Font for bubble nodes of single character tokens.</div></blockquote>
 <p>bubble_font</p>
 <blockquote>
 <div>Font for bubble nodes.</div></blockquote>
+<p>token_font</p>
+<blockquote>
+<div>Font for bubble nodes of single character tokens.</div></blockquote>
 <p>box_font</p>
 <blockquote>
 <div>Font for boxed nodes.</div></blockquote>
@@ -335,7 +358,15 @@ box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
 </div></blockquote>
 <div class="section" id="colors">
 <h3>Colors<a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h3>
-<p>The various keys controlling coloration can use a variety of color formats. The primary color representation is a 3 or 4-tuple representing RGB or RGBA channels. All channels are an integer ranging from 0 to 255. If you have the optional <a class="reference external" href="http://pypi.python.org/pypi/webcolors/">webcolors</a> package installed you can use color names as a value.</p>
+<p>The various keys controlling coloration can use a variety of color formats. The primary color representation is a 3 or 4-tuple representing RGB or RGBA channels. All channels are an integer ranging from 0 to 255. You can also specify RGB colors as a hex string. If you have the optional <a class="reference external" href="http://pypi.python.org/pypi/webcolors/">webcolors</a> package installed you can use color names as a value.</p>
+<div class="highlight-python"><div class="highlight"><pre>; Supported color formats:
+
+(255,100,0)     ; RGB
+(255,100,0,100) ; RGBA
+&#39;#AABBCC&#39;       ; Hex string
+&#39;red&#39;           ; Named web color (with optional package)
+</pre></div>
+</div>
 </div>
 <div class="section" id="fonts">
 <h3>Fonts<a class="headerlink" href="#fonts" title="Permalink to this headline">¶</a></h3>
@@ -351,8 +382,21 @@ box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
 </div>
 </div>
 <div class="section" id="hyperlinked-svg">
-<h2>Hyperlinked SVG<a class="headerlink" href="#hyperlinked-svg" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
+<span id="hyperlinked-text"></span><h2>Hyperlinked SVG<a class="headerlink" href="#hyperlinked-svg" title="Permalink to this headline">¶</a></h2>
+<p>SVG images can have hyperlinked bubble text. This is implemented by adding a <tt class="docutils literal"><span class="pre">url_map</span></tt> dictionary after the diagram specification. The keys of the dictionary are the text identifying the bubble and their values are the URL for the link. The text key should not include any leading &#8220;/&#8221; character for the box bubbles.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stack</span><span class="p">(</span>
+ <span class="n">line</span><span class="p">(</span><span class="s">&#39;attribute&#39;</span><span class="p">,</span> <span class="s">&#39;/(attribute) identifier&#39;</span><span class="p">,</span> <span class="s">&#39;of&#39;</span><span class="p">),</span>
+ <span class="n">line</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="n">toploop</span><span class="p">(</span><span class="s">&#39;/entity_designator&#39;</span><span class="p">,</span> <span class="s">&#39;,&#39;</span><span class="p">),</span> <span class="s">&#39;others&#39;</span><span class="p">,</span> <span class="s">&#39;all&#39;</span><span class="p">),</span> <span class="s">&#39;:&#39;</span><span class="p">),</span>
+ <span class="n">line</span><span class="p">(</span><span class="s">&#39;/entity_class&#39;</span><span class="p">,</span> <span class="s">&#39;is&#39;</span><span class="p">,</span> <span class="s">&#39;/expression&#39;</span><span class="p">,</span> <span class="s">&#39;;&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">url_map</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s">&#39;entity_class&#39;</span><span class="p">:</span> <span class="s">&#39;https://www.google.com/#q=vhdl+entity+class&#39;</span><span class="p">,</span>
+  <span class="s">&#39;(attribute) identifier&#39;</span><span class="p">:</span> <span class="s">&#39;http://en.wikipedia.com/wiki/VHDL&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<object type="image/svg+xml" data="_images/vhdl_attribute_linked.svg"></object><div class="toctree-wrapper compound">
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -410,7 +454,11 @@ box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
 <li><a class="reference internal" href="#licensing">Licensing</a></li>
 <li><a class="reference internal" href="#download">Download</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#using-syntrax">Using Syntrax</a></li>
+<li><a class="reference internal" href="#using-syntrax">Using Syntrax</a><ul>
+<li><a class="reference internal" href="#transparency">Transparency</a></li>
+<li><a class="reference internal" href="#scaling">Scaling</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#specification-language">Specification language</a><ul>
 <li><a class="reference internal" href="#line">line</a></li>
 <li><a class="reference internal" href="#loop">loop</a></li>
@@ -423,7 +471,7 @@ box_font = [&#39;Times&#39;, 14, &#39;italic&#39;]
 <li><a class="reference internal" href="#rightstack">rightstack</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#ini-configuration">INI configuration</a><ul>
+<li><a class="reference internal" href="#styling-diagrams">Styling diagrams</a><ul>
 <li><a class="reference internal" href="#colors">Colors</a></li>
 <li><a class="reference internal" href="#fonts">Fonts</a></li>
 </ul>
