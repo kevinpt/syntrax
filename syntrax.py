@@ -1494,7 +1494,7 @@ class RailroadLayout(object):
       elif spec[0] == 'stack':
         return self.draw_stack(0, spec[1:])
       elif spec[0] == 'indentstack':
-        hsep = s.h_sep * spec[1]
+        hsep = self.style.h_sep * spec[1]
         return self.draw_stack(hsep, spec[2:])
       elif spec[0] == 'rightstack':
         return self.draw_stack(-1, spec[1:])
@@ -1771,7 +1771,7 @@ def dump_style_ini(ini_file):
   with open(ini_file, 'w') as fh:
     fh.write('[style]\n')
     for k in keys:
-      fh.write('{} = {}\n'.format(k, getattr(defaults, k)))
+      fh.write('{} = {}\n'.format(k, repr(getattr(defaults, k))))
 
 def parse_args():
   parser = argparse.ArgumentParser(description='Railroad diagram generator')
