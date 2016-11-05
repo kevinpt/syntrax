@@ -23,8 +23,6 @@ This is processed by Syntrax to generate an SVG image:
 
 JSON number syntax
 
-.. image:: http://kevinpt.github.io/syntrax/_static/syntrax_icon.png
-
 
 Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have `hyperlinked text <http://kevinpt.github.io/syntrax/index.html#hyperlinked-text>`_ allowing users to quickly navigate to documentation of different syntax elements.
 
