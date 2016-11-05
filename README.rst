@@ -19,8 +19,7 @@ The specification is a set of nested Python function calls:
 
 This is processed by Syntrax to generate an SVG image:
 
-.. figure:: http://kevinpt.github.io/syntrax/_static/json_number.png
-  :align: center
+.. image:: http://kevinpt.github.io/syntrax/_static/json_number.png
 
   JSON number syntax
 
