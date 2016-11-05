@@ -975,7 +975,7 @@ class RailroadLayout(object):
       font = {'style':s.bubble_font, 'name':'bubble_font'}
       fill = s.symbol_fill
       istoken = 1
-    elif re.match(r'^/\w', txt): # Non-token
+    elif re.match(r'^/', txt): # Non-token
       txt = txt[1:]
       font = {'style':s.box_font, 'name':'box_font'}
       fill = s.bubble_fill
