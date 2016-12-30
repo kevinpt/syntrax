@@ -11,6 +11,7 @@ import os
 import io
 import copy
 import subprocess
+import collections
 
 import cairo
 import math
@@ -69,8 +70,46 @@ def cairo_text_bbox(text, font_params):
   return [x0,y0, x0+w,y0+h]
 
 
+
+class NodeStyle(object):
+  def __init__(self, name, node_style=None):
+    self.name = name
+    self.pattern = '.'
+    self.shape = 'bubble'
+    self.text_mod = None
+    self.text_mod_func = None
+    self.font = ['Helvetica', 14, 'bold']
+    self.text_color = (0,0,0)
+    self.fill = (144,164,174)
+
+    if node_style is None:
+      node_style = {}
+
+    for k,v in node_style.iteritems():
+      if hasattr(self, k):
+        # Check for color styles
+        if k.endswith('fill') or k.endswith('color'):
+          v = convert_color(v)
+        setattr(self, k, v)
+
+    if self.text_mod is not None:
+      self.text_mod_func = eval(self.text_mod) # WARNING: eval() on user input
+
+  def __repr__(self):
+    return """[{}]
+pattern = '{}'
+shape = '{}'
+text_mod = '{}'
+font = {}
+text_color = {}
+fill = {}
+""".format(self.name, self.pattern, self.shape, self.text_mod, self.font,
+  self.text_color, self.fill)
+
+
+
 class DrawStyle(object):
-  def __init__(self, styles=None):
+  def __init__(self, styles=None, node_styles=[]):
     # Set defaults
     self.line_width = 2
     self.line_color = (0,0,0)
@@ -82,15 +121,10 @@ class DrawStyle(object):
     self.arrows = True
     self.title_pos = 'tl'
     self.bullet_fill = (255,255,255)
-    self.symbol_fill = (179,229,252)
-    self.bubble_fill = (144,164,174)
     self.text_color = (0,0,0)
     self.shadow = True
     self.shadow_fill = (0,0,0, 127)
-    self.token_font = ['Helvetica', 16, 'bold']
-    self.bubble_font = ['Helvetica', 14, 'bold']
-    self.box_font = ['Times', 14, 'italic']
-    self.title_font = ['Helvetica', 22, 'bold']
+    self.title_font = ('Helvetica', 22, 'bold')
 
     # Load any styles
     if styles is None:
@@ -100,25 +134,66 @@ class DrawStyle(object):
       if hasattr(self, k):
         # Check for color styles
         if k.endswith('_fill') or k.endswith('_color'):
-          rgb = v
+          v = convert_color(v)
 
-          # Check for hex string
-          try:
-            rgb = hex_to_rgb(rgb)
-          except (TypeError, ValueError):
-            pass
-
-          # Check for named color
-          if have_webcolors:
-            try:
-              rgb = webcolors.name_to_rgb(rgb)
-            except AttributeError:
-              pass
-
-          # Restrict to valid range
-          rgb = [0 if c < 0 else 255 if c > 255 else c for c in rgb]
-          v = rgb
         setattr(self, k, v)
+
+    # Set node style defaults
+    if len(node_styles) == 0:
+      node_styles = [
+        ('bubble', {'shape':'bubble', 'pattern':'^\w', 'font':('Helvetica', 14, 'bold'), 'fill':(144, 164, 174)}),
+        ('box', {'shape':'box', 'pattern':'^/', 'font':('Helvetica', 14, 'bold'),
+                'fill':(179, 229, 252), 'text_mod':'lambda txt: txt[1:]'}),
+        ('token', {'shape':'bubble', 'pattern':'.', 'font':('Helvetica', 16, 'bold'), 'fill':(144, 164, 174)}),
+      ]
+
+    for _, ns in node_styles:
+      if 'text_color' not in ns:
+        ns['text_color'] = self.text_color
+
+    # Init node styles
+    self.node_styles = [NodeStyle(name, ns) for name,ns in node_styles]
+
+  def __repr__(self):
+    keys = ('line_width',
+      'bubble_width',
+      'padding',
+      'line_color',
+      'max_radius',
+      'h_sep',
+      'v_sep',
+      'arrows',
+      'title_pos',
+      'bullet_fill',
+      'text_color',
+      'shadow',
+      'shadow_fill',
+      'title_font')
+
+    ini_keys = ['{} = {}'.format(k, repr(getattr(self, k))) for k in keys]
+
+    return '[style]\n{}\n'.format('\n'.join(ini_keys))
+
+
+def convert_color(c):
+  rgb = c
+
+  # Check for hex string
+  try:
+    rgb = hex_to_rgb(rgb)
+  except (TypeError, ValueError):
+    pass
+
+  # Check for named color
+  if have_webcolors:
+    try:
+      rgb = webcolors.name_to_rgb(rgb)
+    except AttributeError:
+      pass
+
+  # Restrict to valid range
+  rgb = tuple(0 if c < 0 else 255 if c > 255 else c for c in rgb)
+  return rgb
 
 def rgb_to_hex(rgb):
   return '#{:02X}{:02X}{:02X}'.format(*rgb[:3])
@@ -146,14 +221,22 @@ def parse_style_config(fname):
   cp = SafeConfigParser()
   cp.read(fname)
 
-  sname = 'style'
-
   styles = {}
 
-  if sname in cp.sections():
+  # Extract all sections into a dictionary
+  sd = collections.OrderedDict()
+  for sname in cp.sections():
+    opts = {}
     for opt in cp.options(sname):
-      styles[opt] = ast.literal_eval(cp.get(sname, opt))
+      opts[opt] = ast.literal_eval(cp.get(sname, opt))
+    sd[sname] = opts
 
+  # Style section is main set of style settings
+  if 'style' in sd:
+    styles = sd['style']
+
+  # All remaining sections are node styles
+  node_styles = [(k,v) for k,v in sd.iteritems() if k != 'style']
 
   # Simplify title position
   if 'title_pos' in styles:
@@ -167,7 +250,7 @@ def parse_style_config(fname):
     pos = pos.replace(' ', '')
     styles['title_pos'] = pos
 
-  return DrawStyle(styles)
+  return DrawStyle(styles, node_styles)
 
 class BaseShape(object):
   def __init__(self):
@@ -403,10 +486,13 @@ def cairo_draw_shape(shape, c, styles):
 
   c.set_line_width(width)
 
+  text_color = shape.options['text_color'] if 'text_color' in shape.options \
+    else styles.text_color
+
 
   if isinstance(shape, TextShape):
     x0, y0, x1, y1 = shape.points
-    cairo_draw_text(x0, y0, shape.options['text'], shape.options['font'], styles.text_color, c)
+    cairo_draw_text(x0, y0, shape.options['text'], shape.options['font'], text_color, c)
 
   elif isinstance(shape, LineShape):
     x0, y0, x1, y1 = shape.points
@@ -509,7 +595,7 @@ def cairo_draw_shape(shape, c, styles):
       x, y = shape.options['text_pos']
       x += (x0 + x1) / 2
       y += (y0 + y1) / 2
-      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], styles.text_color, c)
+      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], text_color, c)
 
   elif isinstance(shape, BoxBubbleShape):
     x0, y0, x1, y1 = shape.points
@@ -544,7 +630,7 @@ def cairo_draw_shape(shape, c, styles):
       x, y = shape.options['text_pos']
       x += (x0 + x1) / 2
       y += (y0 + y1) / 2
-      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], styles.text_color, c)
+      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], text_color, c)
 
   elif isinstance(shape, OvalShape):
     x0, y0, x1, y1 = shape.points
@@ -976,23 +1062,20 @@ class RailroadLayout(object):
   def format_text(self, txt):
     s = self.style
 
-    if re.match(r'^\w', txt): # Text token
-      #txt = txt[1:]
-      font = {'style':s.bubble_font, 'name':'bubble_font'}
-      fill = s.symbol_fill
-      istoken = 1
-    elif re.match(r'^/', txt): # Non-token
-      txt = txt[1:]
-      font = {'style':s.box_font, 'name':'box_font'}
-      fill = s.bubble_fill
-      istoken = 0
-    else: # Symbolic token
-      font = {'style':s.token_font, 'name':'token_font'}
-      fill = s.symbol_fill
-      istoken = 1
+    # Default to first node style
+    node_style = s.node_styles[0]
 
-    return (txt, font, fill, istoken)
+    # Check each node pattern for a match
+    for ns in s.node_styles:
+      if re.match(ns.pattern, txt):
+        node_style = ns
+        break
 
+    # Apply any text transformation for this style
+    if ns.text_mod_func:
+      txt = ns.text_mod_func(txt)
+
+    return (txt, node_style)
 
   def draw_bubble(self, txt):
     tag = self.get_tag()
@@ -1008,14 +1091,20 @@ class RailroadLayout(object):
       c.create_oval(0,-r,2*r,r, width=s.bubble_width, tags=(tag,), fill=s.bullet_fill)
       return [tag, 2*r, 0]
     else: # Bubble with text inside
-      txt, font, fill, istoken = self.format_text(txt)
+      txt, node_style = self.format_text(txt)
+
+      font = node_style.font
+      font_name = node_style.name + '_font'
+      fill = node_style.fill
+      text_color = node_style.text_color
 
       if txt in self.url_map:
         href = self.url_map[txt]
       else:
         href = None
 
-      id1 = c.create_text(0,0, anchor='c', text=txt, font=font['style'], font_name=font['name'], tags=(tag,))
+      id1 = c.create_text(0,0, anchor='c', text=txt, font=font, font_name=font_name,
+                        text_color=text_color, tags=(tag,))
       x0, y0, x1, y1 = c.bbox(id1)
       
       #print('## TEXT BBOX', x0,y0,x1,y1, txt)
@@ -1032,7 +1121,7 @@ class RailroadLayout(object):
 #      right = x1 - fudge
       left = x0
       right = x1
-      if istoken:
+      if node_style.shape == 'bubble':
         left += rad // 2 - 2
         right -= rad // 2 - 2
       else: # Add fixed padding
@@ -1046,36 +1135,15 @@ class RailroadLayout(object):
       tag2 = self.get_tag(suffix='-box')
       tags = [tag, tag2]
 
-      if istoken: # Rounded bubble
-#        # Fill
-#        c.create_arc(left-rad, top, left+rad, btm, width=0, fill=fill, outline=fill, start=90, extent=180, style='pieslice', \
-#          tags=tags)
-#        c.create_arc(right-rad, top, right+rad, btm, width=0, fill=fill, outline=fill, start=-90, extent=180, style='pieslice', \
-#          tags=tags)
-#
-#        if left < right: # Fill the middle
-#          c.create_rectangle(left, top, right, btm, width=0, fill=fill, outline=fill, tags=tags)
-#
-#        # Outline
-#        c.create_arc(left-rad, top, left+rad, btm, width=s.bubble_width, start=90, extent=180, style='arc', \
-#          tags=tags)
-#        c.create_arc(right-rad, top, right+rad, btm, width=s.bubble_width, start=-90, extent=180, style='arc', \
-#          tags=tags)
-#
-#        if left < right: # Join rounded ends in the middle
-#          c.create_line(left, top, right, top, width=s.bubble_width, tags=tags)
-#          c.create_line(left, btm, right, btm, width=s.bubble_width, tags=tags)
-          
+      if node_style.shape == 'bubble': # Rounded bubble
         c.delete(id1)
         c.create_bubble(left-rad, top, right+rad, btm, text=txt, text_pos=(x0,y0),
-          font=font['style'], font_name=font['name'], width=s.bubble_width, tags=tags, fill=fill, href=href)
+          font=font, font_name=font_name, text_color=text_color, width=s.bubble_width, tags=tags, fill=fill, href=href)
 
       else: # Box bubble
-        #print('## BUBBLE', left, top, right, btm)
-        #c.create_rectangle(left, top, right, btm, width=s.bubble_width, tags=tags, fill=fill)
         c.delete(id1)
         c.create_boxbubble(left, top, right, btm, text=txt, text_pos=(x0,y0),
-          font=font['style'], font_name=font['name'], width=s.bubble_width, tags=tags, fill=fill, href=href)
+          font=font, font_name=font_name, text_color=text_color, width=s.bubble_width, tags=tags, fill=fill, href=href)
         
       x0, y0, x1,y1 = c.bbox(tag2)
       #print('## BUBBLE BBOX:', x0, y0, x1, y1)
@@ -1615,8 +1683,17 @@ def render_railroad(spec, title, url_map, out_file, backend, styles, scale, tran
     text_color = rgb_to_hex(styles.text_color)
     css = []
 
+    fonts = {}
+    # Collect fonts from common styles
     for f in [k for k in dir(styles) if k.endswith('_font')]:
-      family, size, weight = getattr(styles, f)
+      fonts[f] = (getattr(styles, f), text_color)
+    # Collect node style fonts
+    for ns in styles.node_styles:
+      fonts[ns.name + '_font'] = (ns.font, rgb_to_hex(ns.text_color))
+
+    for f, fs in fonts.iteritems():
+      family, size, weight = fs[0]
+      text_color = fs[1]
 
       if weight == 'italic':
         style = 'italic'
@@ -1627,6 +1704,7 @@ def render_railroad(spec, title, url_map, out_file, backend, styles, scale, tran
       css.append('''.{} {{fill:{}; text-anchor:middle;
     font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(f,
       text_color, family, size, weight, style))
+
 
     font_styles = '\n'.join(css)
     line_color = rgb_to_hex(styles.line_color)
@@ -1751,14 +1829,9 @@ def dump_style_ini(ini_file):
     'arrows',
     'title_pos',
     'bullet_fill',
-    'symbol_fill',
-    'bubble_fill',
     'text_color',
     'shadow',
     'shadow_fill',
-    'bubble_font',
-    'token_font',
-    'box_font',
     'title_font')
 
   defaults = DrawStyle()
@@ -1769,9 +1842,10 @@ def dump_style_ini(ini_file):
 
   print('Creating ini with default styles in "{}"'.format(ini_file))
   with open(ini_file, 'w') as fh:
-    fh.write('[style]\n')
-    for k in keys:
-      fh.write('{} = {}\n'.format(k, repr(getattr(defaults, k))))
+    fh.write(str(defaults))
+    for ns in defaults.node_styles:
+      fh.write('\n')
+      fh.write(str(ns))
 
 def parse_args():
   parser = argparse.ArgumentParser(description='Railroad diagram generator')
