@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by Syntax-Trax http://kevinpt.github.io/syntax-trax -->
+<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xml:space="preserve"
+width="203" height="50" version="1.1">
+<style type="text/css">
+<![CDATA[
+.box_font {fill:#000000; text-anchor:middle;
+    font-family:Times; font-size:14pt; font-weight:normal; font-style:italic;}
+.bubble_font {fill:#000000; text-anchor:middle;
+    font-family:Helvetica; font-size:14pt; font-weight:bold; font-style:normal;}
+.title_font {fill:#000000; text-anchor:middle;
+    font-family:Helvetica; font-size:22pt; font-weight:bold; font-style:normal;}
+.token_font {fill:#000000; text-anchor:middle;
+    font-family:Helvetica; font-size:16pt; font-weight:bold; font-style:normal;}
+.label {fill:#000;
+  text-anchor:middle;
+  font-size:16pt; font-weight:bold; font-family:Sans;}
+.link {fill: #0D47A1;}
+.link:hover {fill: #0D47A1; text-decoration:underline;}
+.link:visited {fill: #4A148C;}
+]]>
+</style>
+<defs>
+  <marker id="arrow" markerWidth="5" markerHeight="4" refX="2.5" refY="2" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L0.5,2 L0,4 L4.5,2 z" fill="#000000" />
+  </marker>
+</defs>
+<path d="M67.0,41.0 A16.0,16.0 0 0,1 67.0,9.0 H142.0 A16.0,16.0 0 0,1 142.0,41.0 z" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<circle cx="9" cy="21.0" r="3" stroke="#000000" stroke-width="2" fill="#FFFFFF"/>
+<path d="M64.0,38.0 A16.0,16.0 0 0,1 64.0,6.0 H139.0 A16.0,16.0 0 0,1 139.0,38.0 z" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
+<text class="bubble_font" x="101.5" y="29.0">SYNTRAX</text>
+<line x1="100.0" y1="44.0" x2="101.0" y2="44.0" stroke="#000000" stroke-width="2" />
+<line x1="29" y1="21.0" x2="43.0" y2="21.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<line x1="156.0" y1="21.0" x2="175.0" y2="21.0" stroke="#000000" stroke-width="2" />
+<path d="M38.0,30.0 A9,9 0 0,0 29.0,21.0" stroke="#000000" stroke-width="2" fill="none"/>
+<line x1="47" y1="44.0" x2="96.0" y2="44.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<line x1="101.0" y1="44.0" x2="152.0" y2="44.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<path d="M38.0,35.0 A9,9 0 0,0 47.0,44.0" stroke="#000000" stroke-width="2" fill="none"/>
+<path d="M156.0,44.0 A9.0,9.0 0 0,0 165.0,35.0" stroke="#000000" stroke-width="2" fill="none"/>
+<path d="M174.0,21.0 A9.0,9.0 0 0,0 165.0,30.0" stroke="#000000" stroke-width="2" fill="none"/>
+<line x1="38" y1="35.0" x2="38" y2="30.0" stroke="#000000" stroke-width="2" />
+<line x1="165.0" y1="35.0" x2="165.0" y2="30.0" stroke="#000000" stroke-width="2" />
+<line x1="11" y1="21.0" x2="25.0" y2="21.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<circle cx="194.0" cy="21.0" r="3.0" stroke="#000000" stroke-width="2" fill="#FFFFFF"/>
+<line x1="173.0" y1="21.0" x2="187.0" y2="21.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+</svg>

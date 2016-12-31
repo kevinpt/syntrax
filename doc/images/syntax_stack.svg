@@ -11,7 +11,7 @@ width="252" height="116" version="1.1">
 .bubble_font {fill:#000000; text-anchor:middle;
     font-family:Helvetica; font-size:14pt; font-weight:bold; font-style:normal;}
 .title_font {fill:#000000; text-anchor:middle;
-    font-family:Helvetica; font-size:24pt; font-weight:bold; font-style:normal;}
+    font-family:Helvetica; font-size:22pt; font-weight:bold; font-style:normal;}
 .token_font {fill:#000000; text-anchor:middle;
     font-family:Helvetica; font-size:16pt; font-weight:bold; font-style:normal;}
 .label {fill:#000;
