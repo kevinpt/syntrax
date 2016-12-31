@@ -2,7 +2,7 @@
 Syntrax
 =======
 
-Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected bubbles.
+Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected nodes.
 
 The specification is a set of nested Python function calls:
 
@@ -178,7 +178,7 @@ You can include a title in the generated diagram by passing a string to the ``--
 Specification language
 ----------------------
 
-Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with "/". Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for syntactic elements too complex to include in the current diagram. Bubbles starting with a non-alphanumeric character are rendered with their own font style so that punctuation tokens can be made more distinct.
+Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with "/". Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for syntactic elements too complex to include in the current diagram. Nodes starting with a non-alphanumeric character are rendered with their own font style so that punctuation tokens can be made more distinct.
 
 The following functions are available for creating diagrams:
 
@@ -403,11 +403,11 @@ Here is the same diagram with modified styling:
   shadow_fill = (0, 0, 0, 127)
   title_font = ('Helvetica', 22, 'bold')
 
-  [bubble]
+  [hex_bubble]                 ; User-defined style name
   pattern = '^\w'
-  shape = 'hex'               ; Hexagon shape for node
+  shape = 'hex'                ; Hexagon shape for node
   font = ('Helvetica', 14, 'bold')
-  fill = (255,0,0,127)        ; Alpha component for transparent fills
+  fill = (255,0,0,127)         ; Alpha component for transparent fills
 
   [box]
   pattern = '^/'
@@ -421,7 +421,7 @@ Here is the same diagram with modified styling:
   pattern = '.'
   shape = 'bubble'
   font = ('Times', 16, 'italic')
-  fill = 'orange'
+  fill = (0,255,0,127)
   
 .. image:: images/vhdl_attribute_alt.svg  
   
@@ -451,7 +451,7 @@ The ``[style]`` section contains the following keys:
 
   line_color
 
-    Color of the connecting lines and bubble outlines. Default is (0,0,0) Black.
+    Color of the connecting lines and node outlines. Default is (0,0,0) Black.
 
   max_radius
   
@@ -490,7 +490,7 @@ The ``[style]`` section contains the following keys:
   shadow
 
 
-    Boolean controlling the rendering of bubble shadows. Default is True.
+    Boolean controlling the rendering of node shadows. Default is True.
 
 
   shadow_fill
@@ -563,7 +563,7 @@ Fonts are specified as a tuple of three items in the following order:
 
 .. parsed-literal::
 
-  bubble_font = ('Helvetica', 14, 'bold')
+  title_font = ('Helvetica', 14, 'bold')
 
 
 .. _hyperlinked text:
@@ -571,7 +571,7 @@ Fonts are specified as a tuple of three items in the following order:
 Hyperlinked SVG
 ---------------
 
-SVG images can have hyperlinked bubble text. This is implemented by adding a ``url_map`` dictionary after the diagram specification. The keys of the dictionary are the text identifying the bubble and their values are the URL for the link. The text key should not include any leading "/" character for the box bubbles.
+SVG images can have hyperlinked node text. This is implemented by adding a ``url_map`` dictionary after the diagram specification. The keys of the dictionary are the text identifying the node and their values are the URL for the link. The text key should not include any leading "/" character for the box nodes.
 
 .. code-block:: python
 
