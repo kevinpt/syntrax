@@ -3,17 +3,17 @@
 <svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink"
 xml:space="preserve"
-width="433" height="306" version="1.1">
+width="446" height="306" version="1.1">
 <style type="text/css">
 <![CDATA[
-.box_font {fill:#000000; text-anchor:middle;
-    font-family:Helvetica; font-size:14pt; font-weight:normal; font-style:normal;}
-.bubble_font {fill:#000000; text-anchor:middle;
+.box_font {fill:#646464; text-anchor:middle;
     font-family:Helvetica; font-size:14pt; font-weight:bold; font-style:normal;}
-.title_font {fill:#000000; text-anchor:middle;
-    font-family:Helvetica; font-size:24pt; font-weight:bold; font-style:normal;}
 .token_font {fill:#000000; text-anchor:middle;
     font-family:Times; font-size:16pt; font-weight:normal; font-style:italic;}
+.title_font {fill:#000000; text-anchor:middle;
+    font-family:Helvetica; font-size:22pt; font-weight:bold; font-style:normal;}
+.hex_bubble_font {fill:#000000; text-anchor:middle;
+    font-family:Helvetica; font-size:14pt; font-weight:bold; font-style:normal;}
 .label {fill:#000;
   text-anchor:middle;
   font-size:16pt; font-weight:bold; font-family:Sans;}
@@ -27,99 +27,84 @@ width="433" height="306" version="1.1">
     <path d="M0,0 L0.5,2 L0,4 L4.5,2 z" fill="#000000" />
   </marker>
 </defs>
-<rect width="100%" height="100%" fill="white"/><path d="M52.0,42.0 A16.0,16.0 0 0,1 52.0,10.0 H114.0 A16.0,16.0 0 0,1 114.0,42.0 z" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<rect x="149.0" y="10.0" width="162.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<path d="M346.0,42.0 A16.0,16.0 0 0,1 346.0,10.0 H353.0 A16.0,16.0 0 0,1 353.0,42.0 z" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<rect x="99.0" y="122.0" width="149.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<circle cx="173.5" cy="99.0" r="17.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<path d="M116.0,192.0 A16.0,16.0 0 0,1 116.0,160.0 H161.0 A16.0,16.0 0 0,1 161.0,192.0 z" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<path d="M116.0,230.0 A16.0,16.0 0 0,1 116.0,198.0 H126.0 A16.0,16.0 0 0,1 126.0,230.0 z" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<circle cx="314.0" cy="138.0" r="17.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<rect x="72.0" y="271.0" width="106.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<path d="M213.0,303.0 A16.0,16.0 0 0,1 213.0,271.0 H218.0 A16.0,16.0 0 0,1 218.0,303.0 z" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<rect x="253.0" y="271.0" width="99.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<circle cx="388.0" cy="287.0" r="17.0" stroke="none" fill-opacity="0.498039215686" fill="#320000"/>
-<circle cx="10" cy="21.0" r="4" stroke="#000000" stroke-width="3" fill="#FFFFFF"/>
-<path d="M48.0,38.0 A16.0,16.0 0 0,1 48.0,6.0 H110.0 A16.0,16.0 0 0,1 110.0,38.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="bubble_font" x="79.0" y="29.0">attribute</text>
-<rect x="145.0" y="6.0" width="162.0" height="32.0" stroke="#000000" stroke-width="3" fill="#6E96FA"/>
-<text class="box_font" x="226.0" y="29.5">(attribute) identifier</text>
-<line x1="126.0" y1="21.0" x2="144.0" y2="21.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M342.0,38.0 A16.0,16.0 0 0,1 342.0,6.0 H349.0 A16.0,16.0 0 0,1 349.0,38.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="bubble_font" x="345.5" y="29.0">of</text>
-<line x1="307.0" y1="21.0" x2="325.0" y2="21.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<rect x="95.0" y="118.0" width="149.0" height="32.0" stroke="#000000" stroke-width="3" fill="#6E96FA"/>
-<text class="box_font" x="169.5" y="141.5">entity_designator</text>
-<circle cx="169.5" cy="95.0" r="17.0" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="token_font" x="169.5" y="102.5">,</text>
-<line x1="94.0" y1="94.0" x2="151.5" y2="94.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="187.5" y1="94.0" x2="245.0" y2="94.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="85.0" y1="133.0" x2="94.0" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M94.0,94.0 A9.0,9.0 0 0,0 85.0,103.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="85.0" y1="103.0" x2="85.0" y2="113.5" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="85.0" y1="113.5" x2="85.0" y2="124.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M85.0,124.0 A9.0,9.0 0 0,0 94.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
-<path d="M254.0,103.0 A9.0,9.0 0 0,0 245.0,94.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="254.0" y1="124.0" x2="254.0" y2="113.5" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="254.0" y1="113.5" x2="254.0" y2="103.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M245.0,133.0 A9.0,9.0 0 0,0 254.0,124.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="245.0" y1="133.0" x2="255.0" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M112.0,188.0 A16.0,16.0 0 0,1 112.0,156.0 H157.0 A16.0,16.0 0 0,1 157.0,188.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="bubble_font" x="134.5" y="179.0">others</text>
-<path d="M112.0,226.0 A16.0,16.0 0 0,1 112.0,194.0 H122.0 A16.0,16.0 0 0,1 122.0,226.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="bubble_font" x="117.0" y="217.0">all</text>
-<line x1="67" y1="133.0" x2="85.0" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="255.0" y1="133.0" x2="276.0" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M76.0,142.0 A9,9 0 0,0 67.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="85" y1="171.0" x2="95" y2="171.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="174.0" y1="171.0" x2="257.0" y2="171.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M76.0,162.0 A9,9 0 0,0 85.0,171.0" stroke="#000000" stroke-width="3" fill="none"/>
-<path d="M257.0,171.0 A9.0,9.0 0 0,0 266.0,162.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="85" y1="209.0" x2="95" y2="209.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="139.0" y1="209.0" x2="257.0" y2="209.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M76.0,200.0 A9,9 0 0,0 85.0,209.0" stroke="#000000" stroke-width="3" fill="none"/>
-<path d="M257.0,209.0 A9.0,9.0 0 0,0 266.0,200.0" stroke="#000000" stroke-width="3" fill="none"/>
-<path d="M275.0,133.0 A9.0,9.0 0 0,0 266.0,142.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="76" y1="200.0" x2="76" y2="142.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="266.0" y1="200.0" x2="266.0" y2="142.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<circle cx="310.0" cy="134.0" r="17.0" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="token_font" x="310.0" y="141.5">:</text>
-<line x1="274.0" y1="133.0" x2="292.0" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="366.0" y1="21.0" x2="384.0" y2="21.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M393.0,30.0 A9.0,9.0 0 0,0 384.0,21.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="393.0" y1="30.0" x2="393.0" y2="39.5" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="393.0" y1="39.5" x2="393.0" y2="49.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M384.0,58.0 A9.0,9.0 0 0,0 393.0,49.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="384.0" y1="58.0" x2="216.5" y2="58.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="216.5" y1="58.0" x2="49" y2="58.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M49.0,58.0 A9,9 0 0,0 40.0,67.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="40" y1="67.0" x2="40" y2="95.5" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="40" y1="95.5" x2="40" y2="124.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M40.0,124.0 A9,9 0 0,0 49.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="49" y1="133.0" x2="67" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<rect x="68.0" y="267.0" width="106.0" height="32.0" stroke="#000000" stroke-width="3" fill="#6E96FA"/>
-<text class="box_font" x="121.0" y="290.5">entity_class</text>
-<path d="M209.0,299.0 A16.0,16.0 0 0,1 209.0,267.0 H214.0 A16.0,16.0 0 0,1 214.0,299.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="bubble_font" x="211.5" y="290.0">is</text>
-<line x1="174.0" y1="282.0" x2="192.0" y2="282.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<rect x="249.0" y="267.0" width="99.0" height="32.0" stroke="#000000" stroke-width="3" fill="#6E96FA"/>
-<text class="box_font" x="298.5" y="290.5">expression</text>
-<line x1="230.0" y1="282.0" x2="248.0" y2="282.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<circle cx="384.0" cy="283.0" r="17.0" fill-opacity="0.498039215686" stroke="#000000" stroke-width="3" fill="#FF0000"/>
-<text class="token_font" x="384.0" y="290.5">;</text>
-<line x1="348.0" y1="282.0" x2="366.0" y2="282.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="328.0" y1="133.0" x2="346.0" y2="133.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M355.0,142.0 A9.0,9.0 0 0,0 346.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="355.0" y1="142.0" x2="355.0" y2="189.5" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="355.0" y1="189.5" x2="355.0" y2="237.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M346.0,246.0 A9.0,9.0 0 0,0 355.0,237.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="346.0" y1="246.0" x2="197.5" y2="246.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="197.5" y1="246.0" x2="49" y2="246.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M49.0,246.0 A9,9 0 0,0 40.0,255.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="40" y1="255.0" x2="40" y2="273.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<path d="M40.0,273.0 A9,9 0 0,0 49.0,282.0" stroke="#000000" stroke-width="3" fill="none"/>
-<line x1="49" y1="282.0" x2="67" y2="282.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<line x1="13" y1="21.0" x2="31" y2="21.0" stroke="#000000" stroke-width="3" fill="#fff" />
-<circle cx="423.0" cy="282.0" r="4.0" stroke="#000000" stroke-width="3" fill="#FFFFFF"/>
-<line x1="401.0" y1="282.0" x2="419.0" y2="282.0" stroke="#000000" stroke-width="3" fill="#fff" />
+<rect width="100%" height="100%" fill="white"/><path d="M41.0,41.0 H119.0 L127.0,25.0 L119.0,9.0 H41.0 L33.0,25.0 z" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<rect x="146.0" y="9.0" width="177.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<path d="M350.0,41.0 H373.0 L381.0,25.0 L373.0,9.0 H350.0 L342.0,25.0 z" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<rect x="96.0" y="121.0" width="162.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<circle cx="177.0" cy="98.0" r="17.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<path d="M105.0,191.0 H166.0 L174.0,175.0 L166.0,159.0 H105.0 L97.0,175.0 z" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<path d="M105.0,229.0 H131.0 L139.0,213.0 L131.0,197.0 H105.0 L97.0,213.0 z" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<circle cx="345.0" cy="137.0" r="17.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<rect x="69.0" y="270.0" width="115.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<path d="M211.0,302.0 H232.0 L240.0,286.0 L232.0,270.0 H211.0 L203.0,286.0 z" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<rect x="259.0" y="270.0" width="107.0" height="32.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<circle cx="402.0" cy="286.0" r="17.0" stroke="none" fill-opacity="0.498039215686" fill="#000000"/>
+<circle cx="9" cy="21.0" r="3" stroke="#000000" stroke-width="2" fill="#FFFF00"/>
+<path d="M38.0,38.0 H116.0 L124.0,22.0 L116.0,6.0 H38.0 L30.0,22.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#FF0000"/>
+<text class="hex_bubble_font" x="77.0" y="29.0">attribute</text>
+<rect x="143.0" y="6.0" width="177.0" height="32.0" stroke="#000000" stroke-width="2" fill="#88AAEE"/>
+<text class="box_font" x="231.5" y="29.0">(attribute) identifier</text>
+<line x1="124.0" y1="21.0" x2="142.0" y2="21.0" stroke="#000000" stroke-width="3" />
+<path d="M347.0,38.0 H370.0 L378.0,22.0 L370.0,6.0 H347.0 L339.0,22.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#FF0000"/>
+<text class="hex_bubble_font" x="358.5" y="29.0">of</text>
+<line x1="320.0" y1="21.0" x2="338.0" y2="21.0" stroke="#000000" stroke-width="3" />
+<rect x="93.0" y="118.0" width="162.0" height="32.0" stroke="#000000" stroke-width="2" fill="#88AAEE"/>
+<text class="box_font" x="174.0" y="141.0">entity_designator</text>
+<circle cx="174.0" cy="95.0" r="17.0" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#00FF00"/>
+<text class="token_font" x="174.0" y="102.5">,</text>
+<line x1="92.0" y1="94.0" x2="156.0" y2="94.0" stroke="#000000" stroke-width="3" />
+<line x1="192.0" y1="94.0" x2="256.0" y2="94.0" stroke="#000000" stroke-width="3" />
+<line x1="83.0" y1="133.0" x2="92.0" y2="133.0" stroke="#000000" stroke-width="3" />
+<path d="M92.0,94.0 A19.5,19.5 0 0,0 92.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
+<path d="M256.0,133.0 A19.5,19.5 0 0,0 256.0,94.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="256.0" y1="133.0" x2="276.5" y2="133.0" stroke="#000000" stroke-width="3" />
+<path d="M102.0,188.0 H163.0 L171.0,172.0 L163.0,156.0 H102.0 L94.0,172.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#FF0000"/>
+<text class="hex_bubble_font" x="132.5" y="179.0">others</text>
+<path d="M102.0,226.0 H128.0 L136.0,210.0 L128.0,194.0 H102.0 L94.0,210.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#FF0000"/>
+<text class="hex_bubble_font" x="115.0" y="217.0">all</text>
+<line x1="65" y1="133.0" x2="83.0" y2="133.0" stroke="#000000" stroke-width="3" />
+<line x1="276.5" y1="133.0" x2="308.0" y2="133.0" stroke="#000000" stroke-width="3" />
+<path d="M74.0,142.0 A9,9 0 0,0 65.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="83" y1="171.0" x2="93" y2="171.0" stroke="#000000" stroke-width="3" />
+<line x1="172.0" y1="171.0" x2="289.0" y2="171.0" stroke="#000000" stroke-width="3" />
+<path d="M74.0,162.0 A9,9 0 0,0 83.0,171.0" stroke="#000000" stroke-width="3" fill="none"/>
+<path d="M289.0,171.0 A9.0,9.0 0 0,0 298.0,162.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="83" y1="209.0" x2="93" y2="209.0" stroke="#000000" stroke-width="3" />
+<line x1="137.0" y1="209.0" x2="289.0" y2="209.0" stroke="#000000" stroke-width="3" />
+<path d="M74.0,200.0 A9,9 0 0,0 83.0,209.0" stroke="#000000" stroke-width="3" fill="none"/>
+<path d="M289.0,209.0 A9.0,9.0 0 0,0 298.0,200.0" stroke="#000000" stroke-width="3" fill="none"/>
+<path d="M307.0,133.0 A9.0,9.0 0 0,0 298.0,142.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="74" y1="200.0" x2="74" y2="142.0" stroke="#000000" stroke-width="3" />
+<line x1="298.0" y1="200.0" x2="298.0" y2="142.0" stroke="#000000" stroke-width="3" />
+<circle cx="342.0" cy="134.0" r="17.0" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#00FF00"/>
+<text class="token_font" x="342.0" y="141.5">:</text>
+<line x1="306.0" y1="133.0" x2="324.0" y2="133.0" stroke="#000000" stroke-width="3" />
+<line x1="379.0" y1="21.0" x2="397.0" y2="21.0" stroke="#000000" stroke-width="3" />
+<path d="M397.0,58.0 A18.5,18.5 0 0,0 397.0,21.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="397.0" y1="58.0" x2="222.0" y2="58.0" stroke="#000000" stroke-width="3" />
+<line x1="222.0" y1="58.0" x2="47" y2="58.0" stroke="#000000" stroke-width="3" />
+<path d="M47.0,58.0 A37.5,37.5 0 0,0 47.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="47" y1="133.0" x2="65" y2="133.0" stroke="#000000" stroke-width="3" />
+<rect x="66.0" y="267.0" width="115.0" height="32.0" stroke="#000000" stroke-width="2" fill="#88AAEE"/>
+<text class="box_font" x="123.5" y="290.0">entity_class</text>
+<path d="M208.0,299.0 H229.0 L237.0,283.0 L229.0,267.0 H208.0 L200.0,283.0 z" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#FF0000"/>
+<text class="hex_bubble_font" x="218.5" y="290.0">is</text>
+<line x1="181.0" y1="282.0" x2="199.0" y2="282.0" stroke="#000000" stroke-width="3" />
+<rect x="256.0" y="267.0" width="107.0" height="32.0" stroke="#000000" stroke-width="2" fill="#88AAEE"/>
+<text class="box_font" x="309.5" y="290.0">expression</text>
+<line x1="237.0" y1="282.0" x2="255.0" y2="282.0" stroke="#000000" stroke-width="3" />
+<circle cx="399.0" cy="283.0" r="17.0" fill-opacity="0.498039215686" stroke="#000000" stroke-width="2" fill="#00FF00"/>
+<text class="token_font" x="399.0" y="290.5">;</text>
+<line x1="363.0" y1="282.0" x2="381.0" y2="282.0" stroke="#000000" stroke-width="3" />
+<line x1="360.0" y1="133.0" x2="378.0" y2="133.0" stroke="#000000" stroke-width="3" />
+<path d="M407.0,162.0 A29.0,29.0 0 0,0 378.0,133.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="407.0" y1="162.0" x2="407.0" y2="217.0" stroke="#000000" stroke-width="3" />
+<path d="M378.0,246.0 A29.0,29.0 0 0,0 407.0,217.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="378.0" y1="246.0" x2="212.5" y2="246.0" stroke="#000000" stroke-width="3" />
+<line x1="212.5" y1="246.0" x2="47" y2="246.0" stroke="#000000" stroke-width="3" />
+<path d="M47.0,246.0 A18.0,18.0 0 0,0 47.0,282.0" stroke="#000000" stroke-width="3" fill="none"/>
+<line x1="47" y1="282.0" x2="65" y2="282.0" stroke="#000000" stroke-width="3" />
+<line x1="11" y1="21.0" x2="29" y2="21.0" stroke="#000000" stroke-width="3" />
+<circle cx="437.0" cy="282.0" r="3.0" stroke="#000000" stroke-width="2" fill="#FFFF00"/>
+<line x1="416.0" y1="282.0" x2="434.0" y2="282.0" stroke="#000000" stroke-width="3" />
 </svg>

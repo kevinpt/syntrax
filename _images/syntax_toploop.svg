@@ -11,7 +11,7 @@ width="295" height="90" version="1.1">
 .bubble_font {fill:#000000; text-anchor:middle;
     font-family:Helvetica; font-size:14pt; font-weight:bold; font-style:normal;}
 .title_font {fill:#000000; text-anchor:middle;
-    font-family:Helvetica; font-size:24pt; font-weight:bold; font-style:normal;}
+    font-family:Helvetica; font-size:22pt; font-weight:bold; font-style:normal;}
 .token_font {fill:#000000; text-anchor:middle;
     font-family:Helvetica; font-size:16pt; font-weight:bold; font-style:normal;}
 .label {fill:#000;
@@ -38,31 +38,31 @@ width="295" height="90" version="1.1">
 <text class="token_font" x="65.5" y="74.0">(</text>
 <path d="M118.5,82.0 A16.0,16.0 0 0,1 118.5,50.0 H175.5 A16.0,16.0 0 0,1 175.5,82.0 z" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
 <text class="bubble_font" x="147.0" y="73.0">forward</text>
-<line x1="83.5" y1="65.0" x2="97.5" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="83.5" y1="65.0" x2="97.5" y2="65.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 <circle cx="228.5" cy="66.0" r="18.0" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
 <text class="token_font" x="228.5" y="74.0">)</text>
-<line x1="191.5" y1="65.0" x2="205.5" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="191.5" y1="65.0" x2="205.5" y2="65.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 <circle cx="57.0" cy="24.0" r="18.0" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
 <text class="token_font" x="57.0" y="32.0">(</text>
 <path d="M110.0,40.0 A16.0,16.0 0 0,1 110.0,8.0 H184.0 A16.0,16.0 0 0,1 184.0,40.0 z" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
 <text class="bubble_font" x="147.0" y="31.0">backward</text>
-<line x1="93.0" y1="23.0" x2="80.0" y2="23.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="93.0" y1="23.0" x2="80.0" y2="23.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 <circle cx="237.0" cy="24.0" r="18.0" stroke="#000000" stroke-width="2" fill="#B3E5FC"/>
 <text class="token_font" x="237.0" y="32.0">)</text>
-<line x1="218.0" y1="23.0" x2="205.0" y2="23.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
-<line x1="38" y1="65.0" x2="46.5" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" />
-<line x1="247.5" y1="65.0" x2="256.0" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" />
-<line x1="29" y1="65.0" x2="38" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" />
+<line x1="218.0" y1="23.0" x2="205.0" y2="23.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<line x1="38" y1="65.0" x2="46.5" y2="65.0" stroke="#000000" stroke-width="2" />
+<line x1="247.5" y1="65.0" x2="256.0" y2="65.0" stroke="#000000" stroke-width="2" />
+<line x1="29" y1="65.0" x2="38" y2="65.0" stroke="#000000" stroke-width="2" />
 <path d="M38.0,23.0 A9,9 0 0,0 29.0,32.0" stroke="#000000" stroke-width="2" fill="none"/>
-<line x1="29" y1="32.0" x2="29.0" y2="40.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
-<line x1="29" y1="44.0" x2="29" y2="56.0" stroke="#000000" stroke-width="2" fill="#fff" />
+<line x1="29" y1="32.0" x2="29.0" y2="40.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<line x1="29" y1="44.0" x2="29" y2="56.0" stroke="#000000" stroke-width="2" />
 <path d="M29.0,56.0 A9,9 0 0,0 38.0,65.0" stroke="#000000" stroke-width="2" fill="none"/>
 <path d="M265.0,32.0 A9.0,9.0 0 0,0 256.0,23.0" stroke="#000000" stroke-width="2" fill="none"/>
-<line x1="265.0" y1="56.0" x2="265.0" y2="48.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
-<line x1="265.0" y1="44.0" x2="265.0" y2="32.0" stroke="#000000" stroke-width="2" fill="#fff" />
+<line x1="265.0" y1="56.0" x2="265.0" y2="48.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
+<line x1="265.0" y1="44.0" x2="265.0" y2="32.0" stroke="#000000" stroke-width="2" />
 <path d="M256.0,65.0 A9.0,9.0 0 0,0 265.0,56.0" stroke="#000000" stroke-width="2" fill="none"/>
-<line x1="256.0" y1="65.0" x2="266.0" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" />
-<line x1="11" y1="65.0" x2="25.0" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="256.0" y1="65.0" x2="266.0" y2="65.0" stroke="#000000" stroke-width="2" />
+<line x1="11" y1="65.0" x2="25.0" y2="65.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 <circle cx="286.0" cy="65.0" r="3.0" stroke="#000000" stroke-width="2" fill="#FFFFFF"/>
-<line x1="265.0" y1="65.0" x2="279.0" y2="65.0" stroke="#000000" stroke-width="2" fill="#fff" marker-end="url(#arrow)" />
+<line x1="265.0" y1="65.0" x2="279.0" y2="65.0" stroke="#000000" stroke-width="2" marker-end="url(#arrow)" />
 </svg>

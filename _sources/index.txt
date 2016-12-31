@@ -2,7 +2,7 @@
 Syntrax
 =======
 
-Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected bubbles.
+Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected nodes.
 
 The specification is a set of nested Python function calls:
 
@@ -25,7 +25,7 @@ This is processed by Syntrax to generate an SVG image:
 
 Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have `hyperlinked text`_ allowing users to quickly navigate to documentation of different syntax elements.
 
-Syntrax is a heaviliy modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
+Syntrax is a heavily modified version of the railroad diagram generator used for the `SQLite documentation <https://www.sqlite.org/lang.html>`_. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.
 
 
 
@@ -39,7 +39,7 @@ isn't currently present in your Python distribution. The source is written in
 Python 2.7 syntax but will convert cleanly to Python 3 when the installer
 passes it through 2to3.
 
-The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax.
+The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax. A `Windows installer <http://www.pygtk.org/downloads.html>`_ is available. For Linux distributions you should install the relevant libraries with your package manager.
 
 Licensing
 ---------
@@ -163,11 +163,22 @@ You can control the scale of the resulting image with the ``--scale`` option. It
 
 .. image:: images/scale_big.png
 
+Titles
+~~~~~~
+
+You can include a title in the generated diagram by passing a string to the ``--title`` option. The position of the title is controlled by the ``title_pos`` entry in the styling configuration. It defaults to the top left. The ``title_font`` entry is used to style the font.
+
+
+.. parsed-literal::
+
+  > syntrax -i titling.spec -o svg --title="Diagram with title"
+
+.. image:: images/titling.svg
 
 Specification language
 ----------------------
 
-Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with "/". Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for FIXME.
+Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with "/". Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for syntactic elements too complex to include in the current diagram. Nodes starting with a non-alphanumeric character are rendered with their own font style so that punctuation tokens can be made more distinct.
 
 The following functions are available for creating diagrams:
 
@@ -294,7 +305,6 @@ indentstack
 ~~~~~~~~~~~
 
 For more control of the stacking you can use the ``indentstack()`` element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
-For more control of the stacking you can use the ``indentstack()`` element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
 
 .. code-block:: python
 
@@ -307,6 +317,8 @@ For more control of the stacking you can use the ``indentstack()`` element. It s
 
 rightstack
 ~~~~~~~~~~
+
+The ``rightstack()`` element will right align successive lines without needing to determine the indentation.
 
 .. code-block:: python
 
@@ -322,7 +334,7 @@ Styling diagrams
 
 You can control the styling of the generated diagrams by passing in a style INI file with the ``-s`` option. By default Syntrax will look for a file named "syntrax.ini" in the current directory and use that if it exists. Otherwise it will fall back to its internal defaults.
 
-You can use the ``--get-style`` option to get a copy of the default styles in the current directory so you can quickly make modifications.
+You can use the ``--get-style`` option to generate a copy of the default styles in the current directory so you can quickly make modifications.
 
 Here is the default styling:
 
@@ -330,20 +342,44 @@ Here is the default styling:
 
   [style]
   line_width = 2
-  bubble_width = 2
+  outline_width = 2
   padding = 5
-  line_color = (0,0,0)
+  line_color = (0, 0, 0)
+  max_radius = 9
+  h_sep = 17
+  v_sep = 9
   arrows = True
-  bullet_fill = '#FFFFFF'
-  symbol_fill = '#B3E5FC'
-  bubble_fill = (144,164,174)
-  text_color = (0,0,0)
+  title_pos = 'tl'
+  bullet_fill = (255, 255, 255)
+  text_color = (0, 0, 0)
   shadow = True
-  shadow_fill = (0,0,0,127)
-  bubble_font = ['Helvetica', 14, 'bold']
-  token_font = ['Helvetica', 16, 'bold']
-  box_font = ['Times', 14, 'italic']
-  
+  shadow_fill = (0, 0, 0, 127)
+  title_font = ('Helvetica', 22, 'bold')
+
+  [bubble]
+  pattern = '^\\w'
+  shape = 'bubble'
+  text_mod = None
+  font = ('Helvetica', 14, 'bold')
+  text_color = (0, 0, 0)
+  fill = (179, 229, 252)
+
+  [box]
+  pattern = '^/'
+  shape = 'box'
+  text_mod = 'lambda txt: txt[1:]'
+  font = ('Times', 14, 'italic')
+  text_color = (0, 0, 0)
+  fill = (144, 164, 174)
+
+  [token]
+  pattern = '.'
+  shape = 'bubble'
+  text_mod = None
+  font = ('Helvetica', 16, 'bold')
+  text_color = (0, 0, 0)
+  fill = (179, 229, 252)
+
 .. image:: images/vhdl_attribute_spec.svg  
 
 
@@ -353,26 +389,47 @@ Here is the same diagram with modified styling:
 
   [style]
   line_width = 3               ; Thicker lines
-  bubble_width = 3
+  outline_width = 3
   padding = 5
-  line_color = (0,0,0)
+  line_color = (0, 0, 0)
+  max_radius = 29              ; Larger radii
+  h_sep = 17
+  v_sep = 9
   arrows = False               ; Remove arrows
-  bullet_fill = 'white'        ; Requires optional webcolors package to be installed
-  symbol_fill = (255,0,0,127)  ; Optional alpha component for transparent fills
-  bubble_fill = (110,150,250)
-  text_color = (0,0,0)
+  title_pos = 'tl'
+  bullet_fill = 'yellow'       ; Requires optional webcolors package to be installed
+  text_color = (0, 0, 0)
   shadow = True
-  shadow_fill = (50,0,0,127)
-  bubble_font = ['Helvetica', 14, 'bold']
-  token_font = ['Times', 16, 'italic']
-  box_font = ['Helvetica', 14, 'normal']
+  shadow_fill = (0, 0, 0, 127)
+  title_font = ('Helvetica', 22, 'bold')
 
+  [hex_bubble]                 ; User-defined style name
+  pattern = '^\w'
+  shape = 'hex'                ; Hexagon shape for node
+  font = ('Helvetica', 14, 'bold')
+  fill = (255,0,0,127)         ; Alpha component for transparent fills
+
+  [box]
+  pattern = '^/'
+  shape = 'box'
+  text_mod = 'lambda txt: txt[1:]'
+  font = ('Helvetica', 14, 'bold')
+  text_color = (100, 100, 100)
+  fill = '#88AAEE'
+
+  [token]
+  pattern = '.'
+  shape = 'bubble'
+  font = ('Times', 16, 'italic')
+  fill = (0,255,0,127)
   
 .. image:: images/vhdl_attribute_alt.svg  
   
   
 
-The style configuration file has a single section named "[style]". It contains the following keys:
+The style configuration file has a main section named "[style]" followed by user-defined sections for various node types. The node style is chosen based on a regex pattern applied to the text. The first matched pattern sets the style for a node. Patterns are tested in the same order they appear in the configuration file. The first node style is used by default if no pattern matched the text.
+
+The ``[style]`` section contains the following keys:
 
   line_width
 
@@ -380,10 +437,10 @@ The style configuration file has a single section named "[style]". It contains t
     Connecting line width in pixels. Default is 2.
 
 
-  bubble_width
+  outline_width
 
 
-    Bubble outline width in pixels. Default is 2.
+    Node outline width in pixels. Default is 2.
 
 
   padding
@@ -394,8 +451,19 @@ The style configuration file has a single section named "[style]". It contains t
 
   line_color
 
+    Color of the connecting lines and node outlines. Default is (0,0,0) Black.
 
-    Color of the connecting lines and bubble outlines. Default is (0,0,0) Black.
+  max_radius
+  
+    Maximum radius for turnbacks on loops and stacked connections.
+  
+  h_sep
+  
+    Horizontal separation between nodes.
+  
+  v_sep
+  
+    Vertical separation between line elements.
 
 
   arrows
@@ -403,6 +471,9 @@ The style configuration file has a single section named "[style]". It contains t
 
     Boolean used to control rendering of line arrows. Default is True.
 
+  title_pos
+  
+    Position of the title text. String containing one of 'left', 'center', or 'right' for horizontal position and 'top' or 'bottom' for vertical. These can be abbreviated as 'l', 'c', 'r', 't', and 'b'. Other characters are ignored. Examples are 'top-left', 'bottom center', 'cr', and 'rt'.
 
   bullet_fill
 
@@ -410,49 +481,62 @@ The style configuration file has a single section named "[style]". It contains t
     Fill color for small bullets at start and end of the diagram.
 
 
-  symbol_fill
-
-
-    Fill color for boxed nodes.
-
-
-  bubble_fill
-
-
-    Fill color for bubble nodes.
-
-
   text_color
 
 
-    Color of all text.
+    Default color of all text. Can be overridden with ``text_color`` in a node style section
 
 
   shadow
 
 
-    Boolean controlling the rendering of bubble shadows. Default is True.
+    Boolean controlling the rendering of node shadows. Default is True.
 
 
   shadow_fill
 
     Fill color for shadows.
 
-  bubble_font
-
-    Font for bubble nodes.
-    
-  token_font
-
-    Font for bubble nodes of single character tokens.
-
-  box_font
-
-    Font for boxed nodes.
 
   title_font
 
     Font for image title.
+
+Node styles
+~~~~~~~~~~~
+    
+Nodes are styled with a user-defined section name. The built-in sections are ``[bubble]`` for tokens that start with an alphanumeric character, ``[box]`` for symbols drawn with a boxed outline, and ``[token]`` for tokens that consist of a single punctuation character. You are not limited to these three node styles. Any number of node types can be defined provided they have distinct patterns to match against the node text in your specification file.
+
+The node sections contain the following keys:
+
+  pattern
+  
+    A regex pattern to match the node text to a style.
+    
+    
+  shape
+    
+    Node outline shape. Must be "bubble", "box", or "hex".
+    
+  text_mod
+  
+    Optional lambda expression for transforming text from the specification into the output diagram. This allows you to include additional characters to match against to select the node type and then remove them from the final diagram. It takes the node text string as a single argument and returns the modified text.
+    
+  font
+  
+    Font style for the node.
+    
+  text_color
+  
+    Optional font color for the node. If omitted, the ``text_color`` from the ``[style]`` section is used.
+    
+  fill
+  
+    Shape fill color for the node.
+    
+.. note::
+
+  The ``text_mod`` value is passed through ``eval()`` to create an executable code object. This is a potential security hole if an untrusted user is allowed to control the style settings file.
 
 Colors
 ~~~~~~
@@ -471,7 +555,7 @@ The various keys controlling coloration can use a variety of color formats. The 
 Fonts
 ~~~~~
 
-Fonts are specified as a list of three items in the following order:
+Fonts are specified as a tuple of three items in the following order:
 
 * Font family (Helvetica, Times, Courier, etc.)
 * Point size (12, 14, 16, etc.)
@@ -479,7 +563,7 @@ Fonts are specified as a list of three items in the following order:
 
 .. parsed-literal::
 
-  bubble_font = ['Helvetica', 14, 'bold']
+  title_font = ('Helvetica', 14, 'bold')
 
 
 .. _hyperlinked text:
@@ -487,7 +571,7 @@ Fonts are specified as a list of three items in the following order:
 Hyperlinked SVG
 ---------------
 
-SVG images can have hyperlinked bubble text. This is implemented by adding a ``url_map`` dictionary after the diagram specification. The keys of the dictionary are the text identifying the bubble and their values are the URL for the link. The text key should not include any leading "/" character for the box bubbles.
+SVG images can have hyperlinked node text. This is implemented by adding a ``url_map`` dictionary after the diagram specification. The keys of the dictionary are the text identifying the node and their values are the URL for the link. The text key should not include any leading "/" character for the box nodes.
 
 .. code-block:: python
 
@@ -505,7 +589,7 @@ SVG images can have hyperlinked bubble text. This is implemented by adding a ``u
 
 .. raw:: html
 
-  <object type="image/svg+xml" data="_images/vhdl_attribute_linked.svg"></object>
+  <object type="image/svg+xml" data="_static/vhdl_attribute_linked.svg"></object>
 
 
 Current browser policies lump SVG hyperlinks together with embedded Javascript. Because of this they do not support hyperlinks when an SVG is referenced through an HTML ``<img>`` tag. To get functional links on a web page you must use an ``<object>`` tag instead:

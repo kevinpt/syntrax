@@ -39,7 +39,7 @@
             
   <div class="section" id="syntrax">
 <h1>Syntrax<a class="headerlink" href="#syntrax" title="Permalink to this headline">¶</a></h1>
-<p>Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected bubbles.</p>
+<p>Syntrax is a railroad diagram generator. It creates a visual illustration of the grammar used for programming languages. A specification file describes the syntax as a hierarchy of basic elements. This is processed into an image representing the same syntax with interconnected nodes.</p>
 <p>The specification is a set of nested Python function calls:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">indentstack</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span>
   <span class="n">line</span><span class="p">(</span><span class="n">opt</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">),</span> <span class="n">choice</span><span class="p">(</span><span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">(</span><span class="s">&#39;1-9&#39;</span><span class="p">,</span> <span class="n">loop</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;0-9&#39;</span><span class="p">))),</span>
@@ -54,7 +54,7 @@
 <img src="_images/json_number.svg" /><p class="caption">JSON number syntax</p>
 </div>
 <p>Syntrax can render to PNG bitmap images or SVG, PDF, PS, and EPS vector images. The SVG output can have <a class="reference internal" href="#hyperlinked-text">hyperlinked text</a> allowing users to quickly navigate to documentation of different syntax elements.</p>
-<p>Syntrax is a heaviliy modified version of the railroad diagram generator used for the <a class="reference external" href="https://www.sqlite.org/lang.html">SQLite documentation</a>. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.</p>
+<p>Syntrax is a heavily modified version of the railroad diagram generator used for the <a class="reference external" href="https://www.sqlite.org/lang.html">SQLite documentation</a>. The generator has been ported to Python, converted to use the Cairo rendering backend, and enhanced with configurable layout options.</p>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>Syntrax requires either Python 2.7 or Python 3.x, Pycairo, and Pango.</p>
@@ -62,7 +62,7 @@
 isn&#8217;t currently present in your Python distribution. The source is written in
 Python 2.7 syntax but will convert cleanly to Python 3 when the installer
 passes it through 2to3.</p>
-<p>The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax.</p>
+<p>The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax. A <a class="reference external" href="http://www.pygtk.org/downloads.html">Windows installer</a> is available. For Linux distributions you should install the relevant libraries with your package manager.</p>
 </div>
 <div class="section" id="licensing">
 <h2>Licensing<a class="headerlink" href="#licensing" title="Permalink to this headline">¶</a></h2>
@@ -153,10 +153,17 @@ Rendering to foo.eps using cairo backend
 </div>
 <img alt="_images/scale_big.png" src="_images/scale_big.png" />
 </div>
+<div class="section" id="titles">
+<h3>Titles<a class="headerlink" href="#titles" title="Permalink to this headline">¶</a></h3>
+<p>You can include a title in the generated diagram by passing a string to the <tt class="docutils literal"><span class="pre">--title</span></tt> option. The position of the title is controlled by the <tt class="docutils literal"><span class="pre">title_pos</span></tt> entry in the styling configuration. It defaults to the top left. The <tt class="docutils literal"><span class="pre">title_font</span></tt> entry is used to style the font.</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; syntrax -i titling.spec -o svg --title=&quot;Diagram with title&quot;
+</pre></div>
+</div>
+<img src="_images/titling.svg" /></div>
 </div>
 <div class="section" id="specification-language">
 <h2>Specification language<a class="headerlink" href="#specification-language" title="Permalink to this headline">¶</a></h2>
-<p>Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with &#8220;/&#8221;. Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for FIXME.</p>
+<p>Syntrax diagrams are created using a Python-based specification language. A series of nestable function calls generate specific diagram elements. Nodes in the diagram are represented by quoted strings. Nodes default to rounded bubbles but will change to a box when prefixed with &#8220;/&#8221;. Note that this is the reverse of how the original SQLite generator works. The rounded bubbles are typically used for literal tokens. Boxes are typically place holders for syntactic elements too complex to include in the current diagram. Nodes starting with a non-alphanumeric character are rendered with their own font style so that punctuation tokens can be made more distinct.</p>
 <p>The following functions are available for creating diagrams:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -249,8 +256,7 @@ Rendering to foo.eps using cairo backend
 <img src="_images/syntax_bypass.svg" /></div>
 <div class="section" id="indentstack">
 <h3>indentstack<a class="headerlink" href="#indentstack" title="Permalink to this headline">¶</a></h3>
-<p>For more control of the stacking you can use the <tt class="docutils literal"><span class="pre">indentstack()</span></tt> element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.
-For more control of the stacking you can use the <tt class="docutils literal"><span class="pre">indentstack()</span></tt> element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.</p>
+<p>For more control of the stacking you can use the <tt class="docutils literal"><span class="pre">indentstack()</span></tt> element. It shifts lower lines to the right relative to the top line of the stack. Its first argument is an integer specifing the amount of indentation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">indentstack</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
   <span class="n">line</span><span class="p">(</span><span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">),</span>
   <span class="n">line</span><span class="p">(</span><span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">)</span>
@@ -260,6 +266,7 @@ For more control of the stacking you can use the <tt class="docutils literal"><s
 <img src="_images/syntax_indentstack.svg" /></div>
 <div class="section" id="rightstack">
 <h3>rightstack<a class="headerlink" href="#rightstack" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">rightstack()</span></tt> element will right align successive lines without needing to determine the indentation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">rightstack</span><span class="p">(</span>
   <span class="n">line</span><span class="p">(</span><span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">,</span> <span class="s">&#39;with&#39;</span><span class="p">,</span> <span class="s">&#39;more&#39;</span><span class="p">,</span> <span class="s">&#39;code&#39;</span><span class="p">),</span>
   <span class="n">line</span><span class="p">(</span><span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;line&#39;</span><span class="p">)</span>
@@ -271,91 +278,162 @@ For more control of the stacking you can use the <tt class="docutils literal"><s
 <div class="section" id="styling-diagrams">
 <h2>Styling diagrams<a class="headerlink" href="#styling-diagrams" title="Permalink to this headline">¶</a></h2>
 <p>You can control the styling of the generated diagrams by passing in a style INI file with the <tt class="docutils literal"><span class="pre">-s</span></tt> option. By default Syntrax will look for a file named &#8220;syntrax.ini&#8221; in the current directory and use that if it exists. Otherwise it will fall back to its internal defaults.</p>
-<p>You can use the <tt class="docutils literal"><span class="pre">--get-style</span></tt> option to get a copy of the default styles in the current directory so you can quickly make modifications.</p>
+<p>You can use the <tt class="docutils literal"><span class="pre">--get-style</span></tt> option to generate a copy of the default styles in the current directory so you can quickly make modifications.</p>
 <p>Here is the default styling:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">style</span><span class="p">]</span>
-<span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">bubble_width</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">padding</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">line_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">arrows</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">bullet_fill</span> <span class="o">=</span> <span class="s">&#39;#FFFFFF&#39;</span>
-<span class="n">symbol_fill</span> <span class="o">=</span> <span class="s">&#39;#B3E5FC&#39;</span>
-<span class="n">bubble_fill</span> <span class="o">=</span> <span class="p">(</span><span class="mi">144</span><span class="p">,</span><span class="mi">164</span><span class="p">,</span><span class="mi">174</span><span class="p">)</span>
-<span class="n">text_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">shadow</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">shadow_fill</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">127</span><span class="p">)</span>
-<span class="n">bubble_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">]</span>
-<span class="n">token_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">]</span>
-<span class="n">box_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Times&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;italic&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<img src="_images/vhdl_attribute_spec.svg" /><p>Here is the same diagram with modified styling:</p>
-<div class="highlight-python"><div class="highlight"><pre>[style]
-line_width = 3               ; Thicker lines
-bubble_width = 3
+<pre class="literal-block">
+[style]
+line_width = 2
+outline_width = 2
 padding = 5
-line_color = (0,0,0)
-arrows = False               ; Remove arrows
-bullet_fill = &#39;white&#39;        ; Requires optional webcolors package to be installed
-symbol_fill = (255,0,0,127)  ; Optional alpha component for transparent fills
-bubble_fill = (110,150,250)
-text_color = (0,0,0)
+line_color = (0, 0, 0)
+max_radius = 9
+h_sep = 17
+v_sep = 9
+arrows = True
+title_pos = 'tl'
+bullet_fill = (255, 255, 255)
+text_color = (0, 0, 0)
 shadow = True
-shadow_fill = (50,0,0,127)
-bubble_font = [&#39;Helvetica&#39;, 14, &#39;bold&#39;]
-token_font = [&#39;Times&#39;, 16, &#39;italic&#39;]
-box_font = [&#39;Helvetica&#39;, 14, &#39;normal&#39;]
-</pre></div>
-</div>
-<img src="_images/vhdl_attribute_alt.svg" /><p>The style configuration file has a single section named &#8220;[style]&#8221;. It contains the following keys:</p>
+shadow_fill = (0, 0, 0, 127)
+title_font = ('Helvetica', 22, 'bold')
+
+[bubble]
+pattern = '^\w'
+shape = 'bubble'
+text_mod = None
+font = ('Helvetica', 14, 'bold')
+text_color = (0, 0, 0)
+fill = (179, 229, 252)
+
+[box]
+pattern = '^/'
+shape = 'box'
+text_mod = 'lambda txt: txt[1:]'
+font = ('Times', 14, 'italic')
+text_color = (0, 0, 0)
+fill = (144, 164, 174)
+
+[token]
+pattern = '.'
+shape = 'bubble'
+text_mod = None
+font = ('Helvetica', 16, 'bold')
+text_color = (0, 0, 0)
+fill = (179, 229, 252)
+</pre>
+<img src="_images/vhdl_attribute_spec.svg" /><p>Here is the same diagram with modified styling:</p>
+<pre class="literal-block">
+[style]
+line_width = 3               ; Thicker lines
+outline_width = 3
+padding = 5
+line_color = (0, 0, 0)
+max_radius = 29              ; Larger radii
+h_sep = 17
+v_sep = 9
+arrows = False               ; Remove arrows
+title_pos = 'tl'
+bullet_fill = 'yellow'       ; Requires optional webcolors package to be installed
+text_color = (0, 0, 0)
+shadow = True
+shadow_fill = (0, 0, 0, 127)
+title_font = ('Helvetica', 22, 'bold')
+
+[hex_bubble]                 ; User-defined style name
+pattern = '^w'
+shape = 'hex'                ; Hexagon shape for node
+font = ('Helvetica', 14, 'bold')
+fill = (255,0,0,127)         ; Alpha component for transparent fills
+
+[box]
+pattern = '^/'
+shape = 'box'
+text_mod = 'lambda txt: txt[1:]'
+font = ('Helvetica', 14, 'bold')
+text_color = (100, 100, 100)
+fill = '#88AAEE'
+
+[token]
+pattern = '.'
+shape = 'bubble'
+font = ('Times', 16, 'italic')
+fill = (0,255,0,127)
+</pre>
+<img src="_images/vhdl_attribute_alt.svg" /><p>The style configuration file has a main section named &#8220;[style]&#8221; followed by user-defined sections for various node types. The node style is chosen based on a regex pattern applied to the text. The first matched pattern sets the style for a node. Patterns are tested in the same order they appear in the configuration file. The first node style is used by default if no pattern matched the text.</p>
+<p>The <tt class="docutils literal"><span class="pre">[style]</span></tt> section contains the following keys:</p>
 <blockquote>
 <div><p>line_width</p>
 <blockquote>
 <div>Connecting line width in pixels. Default is 2.</div></blockquote>
-<p>bubble_width</p>
+<p>outline_width</p>
 <blockquote>
-<div>Bubble outline width in pixels. Default is 2.</div></blockquote>
+<div>Node outline width in pixels. Default is 2.</div></blockquote>
 <p>padding</p>
 <blockquote>
 <div>Additional padding around each edge of the image in pixels. Default is 5.</div></blockquote>
 <p>line_color</p>
 <blockquote>
-<div>Color of the connecting lines and bubble outlines. Default is (0,0,0) Black.</div></blockquote>
+<div>Color of the connecting lines and node outlines. Default is (0,0,0) Black.</div></blockquote>
+<p>max_radius</p>
+<blockquote>
+<div>Maximum radius for turnbacks on loops and stacked connections.</div></blockquote>
+<p>h_sep</p>
+<blockquote>
+<div>Horizontal separation between nodes.</div></blockquote>
+<p>v_sep</p>
+<blockquote>
+<div>Vertical separation between line elements.</div></blockquote>
 <p>arrows</p>
 <blockquote>
 <div>Boolean used to control rendering of line arrows. Default is True.</div></blockquote>
+<p>title_pos</p>
+<blockquote>
+<div>Position of the title text. String containing one of &#8216;left&#8217;, &#8216;center&#8217;, or &#8216;right&#8217; for horizontal position and &#8216;top&#8217; or &#8216;bottom&#8217; for vertical. These can be abbreviated as &#8216;l&#8217;, &#8216;c&#8217;, &#8216;r&#8217;, &#8216;t&#8217;, and &#8216;b&#8217;. Other characters are ignored. Examples are &#8216;top-left&#8217;, &#8216;bottom center&#8217;, &#8216;cr&#8217;, and &#8216;rt&#8217;.</div></blockquote>
 <p>bullet_fill</p>
 <blockquote>
 <div>Fill color for small bullets at start and end of the diagram.</div></blockquote>
-<p>symbol_fill</p>
-<blockquote>
-<div>Fill color for boxed nodes.</div></blockquote>
-<p>bubble_fill</p>
-<blockquote>
-<div>Fill color for bubble nodes.</div></blockquote>
 <p>text_color</p>
 <blockquote>
-<div>Color of all text.</div></blockquote>
+<div>Default color of all text. Can be overridden with <tt class="docutils literal"><span class="pre">text_color</span></tt> in a node style section</div></blockquote>
 <p>shadow</p>
 <blockquote>
-<div>Boolean controlling the rendering of bubble shadows. Default is True.</div></blockquote>
+<div>Boolean controlling the rendering of node shadows. Default is True.</div></blockquote>
 <p>shadow_fill</p>
 <blockquote>
 <div>Fill color for shadows.</div></blockquote>
-<p>bubble_font</p>
-<blockquote>
-<div>Font for bubble nodes.</div></blockquote>
-<p>token_font</p>
-<blockquote>
-<div>Font for bubble nodes of single character tokens.</div></blockquote>
-<p>box_font</p>
-<blockquote>
-<div>Font for boxed nodes.</div></blockquote>
 <p>title_font</p>
 <blockquote>
 <div>Font for image title.</div></blockquote>
 </div></blockquote>
+<div class="section" id="node-styles">
+<h3>Node styles<a class="headerlink" href="#node-styles" title="Permalink to this headline">¶</a></h3>
+<p>Nodes are styled with a user-defined section name. The built-in sections are <tt class="docutils literal"><span class="pre">[bubble]</span></tt> for tokens that start with an alphanumeric character, <tt class="docutils literal"><span class="pre">[box]</span></tt> for symbols drawn with a boxed outline, and <tt class="docutils literal"><span class="pre">[token]</span></tt> for tokens that consist of a single punctuation character. You are not limited to these three node styles. Any number of node types can be defined provided they have distinct patterns to match against the node text in your specification file.</p>
+<p>The node sections contain the following keys:</p>
+<blockquote>
+<div><p>pattern</p>
+<blockquote>
+<div>A regex pattern to match the node text to a style.</div></blockquote>
+<p>shape</p>
+<blockquote>
+<div>Node outline shape. Must be &#8220;bubble&#8221;, &#8220;box&#8221;, or &#8220;hex&#8221;.</div></blockquote>
+<p>text_mod</p>
+<blockquote>
+<div>Optional lambda expression for transforming text from the specification into the output diagram. This allows you to include additional characters to match against to select the node type and then remove them from the final diagram. It takes the node text string as a single argument and returns the modified text.</div></blockquote>
+<p>font</p>
+<blockquote>
+<div>Font style for the node.</div></blockquote>
+<p>text_color</p>
+<blockquote>
+<div>Optional font color for the node. If omitted, the <tt class="docutils literal"><span class="pre">text_color</span></tt> from the <tt class="docutils literal"><span class="pre">[style]</span></tt> section is used.</div></blockquote>
+<p>fill</p>
+<blockquote>
+<div>Shape fill color for the node.</div></blockquote>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">text_mod</span></tt> value is passed through <tt class="docutils literal"><span class="pre">eval()</span></tt> to create an executable code object. This is a potential security hole if an untrusted user is allowed to control the style settings file.</p>
+</div>
+</div>
 <div class="section" id="colors">
 <h3>Colors<a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h3>
 <p>The various keys controlling coloration can use a variety of color formats. The primary color representation is a 3 or 4-tuple representing RGB or RGBA channels. All channels are an integer ranging from 0 to 255. You can also specify RGB colors as a hex string. If you have the optional <a class="reference external" href="http://pypi.python.org/pypi/webcolors/">webcolors</a> package installed you can use color names as a value.</p>
@@ -370,20 +448,20 @@ box_font = [&#39;Helvetica&#39;, 14, &#39;normal&#39;]
 </div>
 <div class="section" id="fonts">
 <h3>Fonts<a class="headerlink" href="#fonts" title="Permalink to this headline">¶</a></h3>
-<p>Fonts are specified as a list of three items in the following order:</p>
+<p>Fonts are specified as a tuple of three items in the following order:</p>
 <ul class="simple">
 <li>Font family (Helvetica, Times, Courier, etc.)</li>
 <li>Point size (12, 14, 16, etc.)</li>
 <li>Style (&#8216;normal&#8217;, &#8216;bold&#8217;, &#8216;italic&#8217;)</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">bubble_font</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">title_font</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;Helvetica&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&#39;bold&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="hyperlinked-svg">
 <span id="hyperlinked-text"></span><h2>Hyperlinked SVG<a class="headerlink" href="#hyperlinked-svg" title="Permalink to this headline">¶</a></h2>
-<p>SVG images can have hyperlinked bubble text. This is implemented by adding a <tt class="docutils literal"><span class="pre">url_map</span></tt> dictionary after the diagram specification. The keys of the dictionary are the text identifying the bubble and their values are the URL for the link. The text key should not include any leading &#8220;/&#8221; character for the box bubbles.</p>
+<p>SVG images can have hyperlinked node text. This is implemented by adding a <tt class="docutils literal"><span class="pre">url_map</span></tt> dictionary after the diagram specification. The keys of the dictionary are the text identifying the node and their values are the URL for the link. The text key should not include any leading &#8220;/&#8221; character for the box nodes.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">stack</span><span class="p">(</span>
  <span class="n">line</span><span class="p">(</span><span class="s">&#39;attribute&#39;</span><span class="p">,</span> <span class="s">&#39;/(attribute) identifier&#39;</span><span class="p">,</span> <span class="s">&#39;of&#39;</span><span class="p">),</span>
  <span class="n">line</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="n">toploop</span><span class="p">(</span><span class="s">&#39;/entity_designator&#39;</span><span class="p">,</span> <span class="s">&#39;,&#39;</span><span class="p">),</span> <span class="s">&#39;others&#39;</span><span class="p">,</span> <span class="s">&#39;all&#39;</span><span class="p">),</span> <span class="s">&#39;:&#39;</span><span class="p">),</span>
@@ -396,7 +474,7 @@ box_font = [&#39;Helvetica&#39;, 14, &#39;normal&#39;]
 <span class="p">}</span>
 </pre></div>
 </div>
-<object type="image/svg+xml" data="_images/vhdl_attribute_linked.svg"></object><p>Current browser policies lump SVG hyperlinks together with embedded Javascript. Because of this they do not support hyperlinks when an SVG is referenced through an HTML <tt class="docutils literal"><span class="pre">&lt;img&gt;</span></tt> tag. To get functional links on a web page you must use an <tt class="docutils literal"><span class="pre">&lt;object&gt;</span></tt> tag instead:</p>
+<object type="image/svg+xml" data="_static/vhdl_attribute_linked.svg"></object><p>Current browser policies lump SVG hyperlinks together with embedded Javascript. Because of this they do not support hyperlinks when an SVG is referenced through an HTML <tt class="docutils literal"><span class="pre">&lt;img&gt;</span></tt> tag. To get functional links on a web page you must use an <tt class="docutils literal"><span class="pre">&lt;object&gt;</span></tt> tag instead:</p>
 <div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;object</span> <span class="na">type=</span><span class="s">&quot;image/svg+xml&quot;</span> <span class="na">data=</span><span class="s">&quot;path/to/your.svg&quot;</span><span class="nt">&gt;&lt;/object&gt;</span>
 </pre></div>
 </div>
@@ -463,6 +541,7 @@ box_font = [&#39;Helvetica&#39;, 14, &#39;normal&#39;]
 <li><a class="reference internal" href="#using-syntrax">Using Syntrax</a><ul>
 <li><a class="reference internal" href="#transparency">Transparency</a></li>
 <li><a class="reference internal" href="#scaling">Scaling</a></li>
+<li><a class="reference internal" href="#titles">Titles</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#specification-language">Specification language</a><ul>
@@ -478,6 +557,7 @@ box_font = [&#39;Helvetica&#39;, 14, &#39;normal&#39;]
 </ul>
 </li>
 <li><a class="reference internal" href="#styling-diagrams">Styling diagrams</a><ul>
+<li><a class="reference internal" href="#node-styles">Node styles</a></li>
 <li><a class="reference internal" href="#colors">Colors</a></li>
 <li><a class="reference internal" href="#fonts">Fonts</a></li>
 </ul>
