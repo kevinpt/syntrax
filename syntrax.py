@@ -32,7 +32,7 @@ except ImportError:
   have_webcolors = False
 
 
-__version__ = '0.9'
+__version__ = '0.9.1'
 
 def cairo_font(tk_font):
   family, size, weight = tk_font
@@ -96,16 +96,16 @@ class NodeStyle(object):
       self.text_mod_func = eval(self.text_mod) # WARNING: eval() on user input
 
   def __repr__(self):
-    return """[{}]
-pattern = '{}'
-shape = '{}'
-text_mod = '{}'
-font = {}
-text_color = {}
-fill = {}
-""".format(self.name, self.pattern, self.shape, self.text_mod, self.font,
-  self.text_color, self.fill)
+    keys = (
+      'pattern',
+      'shape',
+      'text_mod',
+      'font',
+      'text_color',
+      'fill')
 
+    ini_keys = ['{} = {}'.format(k, repr(getattr(self, k))) for k in keys]
+    return '[{}]\n{}\n'.format(self.name, '\n'.join(ini_keys))
 
 
 class DrawStyle(object):
@@ -113,7 +113,7 @@ class DrawStyle(object):
     # Set defaults
     self.line_width = 2
     self.line_color = (0,0,0)
-    self.bubble_width = 2
+    self.outline_width = 2
     self.padding = 5
     self.max_radius = 9
     self.h_sep = 17
@@ -142,7 +142,7 @@ class DrawStyle(object):
     if len(node_styles) == 0:
       node_styles = [
         ('bubble', {'shape':'bubble', 'pattern':'^\w', 'font':('Helvetica', 14, 'bold'), 'fill':(144, 164, 174)}),
-        ('box', {'shape':'box', 'pattern':'^/', 'font':('Helvetica', 14, 'bold'),
+        ('box', {'shape':'box', 'pattern':'^/', 'font':('Times', 14, 'italic'),
                 'fill':(179, 229, 252), 'text_mod':'lambda txt: txt[1:]'}),
         ('token', {'shape':'bubble', 'pattern':'.', 'font':('Helvetica', 16, 'bold'), 'fill':(144, 164, 174)}),
       ]
@@ -156,7 +156,7 @@ class DrawStyle(object):
 
   def __repr__(self):
     keys = ('line_width',
-      'bubble_width',
+      'outline_width',
       'padding',
       'line_color',
       'max_radius',
@@ -417,6 +417,13 @@ class BoxBubbleShape(BaseShape):
     self._bbox = [x0, y0, x1, y1]
     self.update_tags()
 
+class HexBubbleShape(BaseShape):
+  def __init__(self, x0, y0, x1, y1, options):
+    BaseShape.__init__(self)
+    self.options = options
+    self._bbox = [x0, y0, x1, y1]
+    self.update_tags()
+
 
 def cairo_draw_arrow(head, tail, fill, c):
   width = c.get_line_width()
@@ -546,7 +553,6 @@ def cairo_draw_shape(shape, c, styles):
 
   elif isinstance(shape, BubbleShape):
     x0, y0, x1, y1 = shape.points
-    #c.rectangle(x0,y0, x1-x0,y1-y0)
 
     stroke = True if shape.options['width'] > 0 else False
 
@@ -596,6 +602,63 @@ def cairo_draw_shape(shape, c, styles):
       x += (x0 + x1) / 2
       y += (y0 + y1) / 2
       cairo_draw_text(x, y, shape.options['text'], shape.options['font'], text_color, c)
+
+  elif isinstance(shape, HexBubbleShape):
+    x0, y0, x1, y1 = shape.points
+
+    stroke = True if shape.options['width'] > 0 else False
+
+    #print('%% HEXBUBBLE:', stroke, shape.points, shape.options)
+
+    rad = (y1 - y0) / 2.0
+    left = x0 + rad
+    right = x1 - rad
+    rpad = rad * 0.5
+
+    xc = (x0 + x1) / 2
+    yc = (y0 + y1) / 2.0
+
+    if abs(right - left) <= 1: # Round hex
+      left = xc
+      right = xc
+
+    c.move_to(xc, y1)
+    c.line_to(right+rpad, y1)
+    c.line_to(right+rad, yc) # Right point
+    c.line_to(right+rpad, y0)
+    c.line_to(left-rpad, y0)
+    c.line_to(left-rad, yc) # Left point
+    c.line_to(left-rpad, y1)
+    c.close_path()
+
+    if 'fill' in shape.options:
+      c.set_source_rgba(*rgb_to_cairo(shape.options['fill']))
+      if stroke:
+        c.fill_preserve()
+      else:
+        c.fill()
+
+    if stroke:
+      c.set_source_rgba(*default_pen)
+      c.stroke()
+
+#    # Add text bounding box
+#    w = x1-x0
+#    h = y1-y0
+#    bx0, by0, bx1, by1 = cairo_text_bbox(shape.options['text'], shape.options['font'])
+#    bw = abs(bx1-bx0)
+#    bh = abs(by1-by0)
+#    c.rectangle(x0 + (w - bw)//2, y0 + (h - bh)//2, bw, bh)
+#    c.set_source_rgba(*default_pen)
+#    c.stroke()
+
+    # Add the text
+    if 'text' in shape.options:
+      x, y = shape.options['text_pos']
+      x += (x0 + x1) / 2
+      y += (y0 + y1) / 2
+      cairo_draw_text(x, y, shape.options['text'], shape.options['font'], text_color, c)
+
 
   elif isinstance(shape, BoxBubbleShape):
     x0, y0, x1, y1 = shape.points
@@ -810,6 +873,42 @@ def svg_draw_shape(shape, fh, styles):
       else:
         fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y, txt))
 
+  elif isinstance(shape, HexBubbleShape):
+    x0, y0, x1, y1 = shape.points
+
+    attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
+
+    rad = (y1 - y0) / 2.0
+    left = x0 + rad
+    right = x1 - rad
+    rpad = rad * 0.5
+
+    xc = (x0 + x1) / 2
+    yc = (y0 + y1) / 2.0
+
+    if abs(right - left) <= 1: # Round hex
+      left = xc
+      right = xc
+
+    fh.write(u'<path d="M{},{} H{} L{},{} L{},{} H{} L{},{} z" {}/>\n'.format(left-rpad,y1,
+    right+rpad, right+rad,yc, right+rpad,y0, left-rpad, left-rad,yc,  attributes))
+
+    # Add the text
+    if 'text' in shape.options:
+      x, y = shape.options['text_pos']
+      th = abs(y)
+  #    y += (y0 + y1) / 2
+      x = (x0 + x1) / 2 # Center in bubble
+      y = ((y0 + y1) / 2) + th / 2
+
+      txt = xml_escape(shape.options['text'])
+      font_name = shape.options['font_name']
+      if 'href' in shape.options and shape.options['href'] is not None: # Hyperlink
+        href = shape.options['href']
+        fh.write(u'<a xlink:href="{}" target="_parent">\n  <text class="{} link" x="{}" y="{}">{}</text></a>\n'.format(href, font_name, x, y, txt))
+      else:
+        fh.write(u'<text class="{}" x="{}" y="{}">{}</text>\n'.format(font_name, x, y, txt))
+
 
   elif isinstance(shape, BoxBubbleShape):
     x0, y0, x1, y1 = shape.points
@@ -916,6 +1015,10 @@ class RailCanvas(object):
 
   def create_boxbubble(self, x0, y0, x1, y1, **options):
     shape = BoxBubbleShape(x0, y0, x1, y1, options)
+    self.shapes.append(shape)
+
+  def create_hexbubble(self, x0, y0, x1, y1, **options):
+    shape = HexBubbleShape(x0, y0, x1, y1, options)
     self.shapes.append(shape)
 
   def create_text(self, x0, y0, **options):
@@ -1083,12 +1186,12 @@ class RailroadLayout(object):
     s = self.style
     
     if txt is None: # Line for skipped options
-      c.create_line(0,0,1,0, width=s.bubble_width, tags=(tag,))
+      c.create_line(0,0,1,0, width=s.outline_width, tags=(tag,))
       return [tag, 1, 0]
     elif txt == 'bullet': # Small bullet
-      w = s.bubble_width
+      w = s.outline_width
       r = w+1
-      c.create_oval(0,-r,2*r,r, width=s.bubble_width, tags=(tag,), fill=s.bullet_fill)
+      c.create_oval(0,-r,2*r,r, width=s.outline_width, tags=(tag,), fill=s.bullet_fill)
       return [tag, 2*r, 0]
     else: # Bubble with text inside
       txt, node_style = self.format_text(txt)
@@ -1121,7 +1224,7 @@ class RailroadLayout(object):
 #      right = x1 - fudge
       left = x0
       right = x1
-      if node_style.shape == 'bubble':
+      if node_style.shape in ('bubble', 'hex'):
         left += rad // 2 - 2
         right -= rad // 2 - 2
       else: # Add fixed padding
@@ -1138,12 +1241,17 @@ class RailroadLayout(object):
       if node_style.shape == 'bubble': # Rounded bubble
         c.delete(id1)
         c.create_bubble(left-rad, top, right+rad, btm, text=txt, text_pos=(x0,y0),
-          font=font, font_name=font_name, text_color=text_color, width=s.bubble_width, tags=tags, fill=fill, href=href)
+          font=font, font_name=font_name, text_color=text_color, width=s.outline_width, tags=tags, fill=fill, href=href)
+
+      elif node_style.shape == 'hex': # Hex bubble
+        c.delete(id1)
+        c.create_hexbubble(left-rad, top, right+rad, btm, text=txt, text_pos=(x0,y0),
+          font=font, font_name=font_name, text_color=text_color, width=s.outline_width, tags=tags, fill=fill, href=href)
 
       else: # Box bubble
         c.delete(id1)
         c.create_boxbubble(left, top, right, btm, text=txt, text_pos=(x0,y0),
-          font=font, font_name=font_name, text_color=text_color, width=s.bubble_width, tags=tags, fill=fill, href=href)
+          font=font, font_name=font_name, text_color=text_color, width=s.outline_width, tags=tags, fill=fill, href=href)
         
       x0, y0, x1,y1 = c.bbox(tag2)
       #print('## BUBBLE BBOX:', x0, y0, x1, y1)
@@ -1658,7 +1766,7 @@ def render_railroad(spec, title, url_map, out_file, backend, styles, scale, tran
 
   if styles.shadow: # Draw shadows first
     bubs = [copy.deepcopy(s) for s in rc.shapes
-      if isinstance(s, BoxBubbleShape) or isinstance(s, BubbleShape)]
+      if isinstance(s, BoxBubbleShape) or isinstance(s, BubbleShape) or isinstance(s, HexBubbleShape)]
 
     # Remove all text and offset shadow
     for s in bubs:
@@ -1820,7 +1928,7 @@ def parse_spec_file(fname):
 
 def dump_style_ini(ini_file):
   keys= ('line_width',
-    'bubble_width',
+    'outline_width',
     'padding',
     'line_color',
     'max_radius',
