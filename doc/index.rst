@@ -362,7 +362,7 @@ Here is the default styling:
   text_mod = None
   font = ('Helvetica', 14, 'bold')
   text_color = (0, 0, 0)
-  fill = (144, 164, 174)
+  fill = (179, 229, 252)
 
   [box]
   pattern = '^/'
@@ -370,7 +370,7 @@ Here is the default styling:
   text_mod = 'lambda txt: txt[1:]'
   font = ('Times', 14, 'italic')
   text_color = (0, 0, 0)
-  fill = (179, 229, 252)
+  fill = (144, 164, 174)
 
   [token]
   pattern = '.'
@@ -378,7 +378,7 @@ Here is the default styling:
   text_mod = None
   font = ('Helvetica', 16, 'bold')
   text_color = (0, 0, 0)
-  fill = (144, 164, 174)
+  fill = (179, 229, 252)
 
 .. image:: images/vhdl_attribute_spec.svg  
 
