@@ -404,7 +404,7 @@ Here is the same diagram with modified styling:
   title_font = ('Helvetica', 22, 'bold')
 
   [hex_bubble]                 ; User-defined style name
-  pattern = '^\w'
+  pattern = '^\\w'
   shape = 'hex'                ; Hexagon shape for node
   font = ('Helvetica', 14, 'bold')
   fill = (255,0,0,127)         ; Alpha component for transparent fills
