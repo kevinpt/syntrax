@@ -354,13 +354,13 @@ Here is the default styling:
   text_color = (0, 0, 0)
   shadow = True
   shadow_fill = (0, 0, 0, 127)
-  title_font = ('Helvetica', 22, 'bold')
+  title_font = ('Sans', 22, 'bold')
 
   [bubble]
   pattern = '^\\w'
   shape = 'bubble'
   text_mod = None
-  font = ('Helvetica', 14, 'bold')
+  font = ('Sans', 14, 'bold')
   text_color = (0, 0, 0)
   fill = (179, 229, 252)
 
@@ -376,7 +376,7 @@ Here is the default styling:
   pattern = '.'
   shape = 'bubble'
   text_mod = None
-  font = ('Helvetica', 16, 'bold')
+  font = ('Sans', 16, 'bold')
   text_color = (0, 0, 0)
   fill = (179, 229, 252)
 
@@ -401,19 +401,19 @@ Here is the same diagram with modified styling:
   text_color = (0, 0, 0)
   shadow = True
   shadow_fill = (0, 0, 0, 127)
-  title_font = ('Helvetica', 22, 'bold')
+  title_font = ('Sans', 22, 'bold')
 
   [hex_bubble]                 ; User-defined style name
   pattern = '^\\w'
   shape = 'hex'                ; Hexagon shape for node
-  font = ('Helvetica', 14, 'bold')
+  font = ('Sans', 14, 'bold')
   fill = (255,0,0,127)         ; Alpha component for transparent fills
 
   [box]
   pattern = '^/'
   shape = 'box'
   text_mod = 'lambda txt: txt[1:]'
-  font = ('Helvetica', 14, 'bold')
+  font = ('Sans', 14, 'bold')
   text_color = (100, 100, 100)
   fill = '#88AAEE'
 
