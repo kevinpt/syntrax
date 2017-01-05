@@ -32,7 +32,7 @@ except ImportError:
   have_webcolors = False
 
 
-__version__ = '0.9.1'
+__version__ = '1.0'
 
 def cairo_font(tk_font):
   family, size, weight = tk_font
@@ -78,7 +78,7 @@ class NodeStyle(object):
     self.shape = 'bubble'
     self.text_mod = None
     self.text_mod_func = None
-    self.font = ['Helvetica', 14, 'bold']
+    self.font = ['Sans', 14, 'bold']
     self.text_color = (0,0,0)
     self.fill = (144,164,174)
 
@@ -124,7 +124,7 @@ class DrawStyle(object):
     self.text_color = (0,0,0)
     self.shadow = True
     self.shadow_fill = (0,0,0, 127)
-    self.title_font = ('Helvetica', 22, 'bold')
+    self.title_font = ('Sans', 22, 'bold')
 
     # Load any styles
     if styles is None:
@@ -141,10 +141,10 @@ class DrawStyle(object):
     # Set node style defaults
     if len(node_styles) == 0:
       node_styles = [
-        ('bubble', {'shape':'bubble', 'pattern':'^\w', 'font':('Helvetica', 14, 'bold'), 'fill':(179, 229, 252)}),
+        ('bubble', {'shape':'bubble', 'pattern':'^\w', 'font':('Sans', 14, 'bold'), 'fill':(179, 229, 252)}),
         ('box', {'shape':'box', 'pattern':'^/', 'font':('Times', 14, 'italic'),
                 'fill':(144, 164, 174), 'text_mod':'lambda txt: txt[1:]'}),
-        ('token', {'shape':'bubble', 'pattern':'.', 'font':('Helvetica', 16, 'bold'), 'fill':(179, 229, 252)}),
+        ('token', {'shape':'bubble', 'pattern':'.', 'font':('Sans', 16, 'bold'), 'fill':(179, 229, 252)}),
       ]
 
     for _, ns in node_styles:
