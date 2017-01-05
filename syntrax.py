@@ -335,16 +335,16 @@ class ArcShape(BaseShape):
   @property
   def bbox(self):
     if 'width' in self.options:
-      w = self.options['width'] / 2
+      w = self.options['width']
     else:
-      w = 1
+      w = 0
 
     # Calculate bounding box for arc segment
     x0, y0, x1, y1 = self.points
-    xc = (x0 + x1) / 2
-    yc = (y0 + y1) / 2
-    rad = (x1 - x0) / 2
-    rad += w
+    xc = (x0 + x1) / 2.0
+    yc = (y0 + y1) / 2.0
+    rad = abs(x1 - x0) / 2.0
+    rad += w / 2.0
 
     start = self.options['start'] % 360
     extent = self.options['extent']
@@ -366,7 +366,7 @@ class ArcShape(BaseShape):
 
 
     # Convert all extrema points to cartesian
-    points = [(rad * math.cos(a*math.pi / 180), rad * math.sin(a*math.pi / 180)) for a in angles]
+    points = [(rad * math.cos(math.radians(a)), -rad * math.sin(math.radians(a))) for a in angles]
 
     points = zip(*points)
     bx0 = min(points[0]) + xc
@@ -727,8 +727,8 @@ def cairo_draw_shape(shape, c, styles):
     extent = shape.options['extent']
 
     # Start and end angles
-    sa = -start * math.pi / 180.0
-    ea = -(start + extent) * math.pi / 180.0
+    sa = -math.radians(start)
+    ea = -math.radians(start + extent)
 
     # Tk has opposite angle convention from Cairo
     #   Positive extent is a negative rotation in Cairo
@@ -755,6 +755,15 @@ def cairo_draw_shape(shape, c, styles):
     c.stroke()
 
     #print('%% ARC:', xc, yc, rad, start, extent)
+
+#    # Draw bounding box
+#    bx0, by0, bx1, by1 = shape.bbox
+#    bw = abs(bx1-bx0)
+#    bh = abs(by1-by0)
+#    c.rectangle(bx0, by0, bw, bh)
+#    c.set_source_rgba(*rgb_to_cairo((255,0,0,127)))
+#    c.set_line_width(1.0)
+#    c.stroke()
 
 
 def xml_escape(txt):
@@ -959,8 +968,8 @@ def svg_draw_shape(shape, fh, styles):
 
 
     # Start and end angles
-    sa = start * math.pi / 180.0
-    ea = stop * math.pi / 180.0
+    sa = math.radians(start)
+    ea = math.radians(stop)
 
     attrs['fill'] = 'none'
 
