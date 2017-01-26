@@ -38,9 +38,15 @@ def cairo_font(tk_font):
   family, size, weight = tk_font
   return pango.FontDescription('{} {} {}'.format(family, weight, size))
 
-def cairo_text_bbox(text, font_params):
+def cairo_text_bbox(text, font_params, scale=1.0):
   surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 8, 8)
   ctx = cairo.Context(surf)
+
+  # The scaling must match the final context.
+  # If not there can be a mismatch between the computed extents here
+  # and those generated for the final render.
+  ctx.scale(scale, scale)
+
   font = cairo_font(font_params)
 
   if use_pygobject:
@@ -269,10 +275,16 @@ class BaseShape(object):
     else:
       w = 1
 
-    x0 = self._bbox[0] - w
-    y0 = self._bbox[1] - w
-    x1 = self._bbox[2] + w
-    y1 = self._bbox[3] + w
+    x0 = min(self._bbox[0], self._bbox[2])
+    x1 = max(self._bbox[0], self._bbox[2])
+    y0 = min(self._bbox[1], self._bbox[3])
+    y1 = max(self._bbox[1], self._bbox[3])
+
+    x0 -= w
+    x1 += w
+    y0 -= w
+    y1 += w
+
     return (x0,y0,x1,y1)
 
   def is_tagged(self, item):
