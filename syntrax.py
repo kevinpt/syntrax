@@ -827,13 +827,13 @@ def svg_draw_shape(shape, fh, styles):
 
     attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
 
-    if 'arrow' not in shape.options:
+    if not shape.options.get('arrow'):
       fh.write(u'<line x1="{}" y1="{}" x2="{}" y2="{}" {} />\n'.format(
         x0,y0,x1,y1, attributes))
     else: # Draw line with arrowhead
       attributes += ' marker-end="url(#arrow)"'
 
-      if shape.options['arrow'] == 'first':
+      if shape.options.get('arrow') == 'first':
         head = x0, y0
         tail = x1, y1
       else: # Last
@@ -1105,6 +1105,7 @@ class RailroadLayout(object):
     self.canvas = canvas
     self.tagcnt = 0
     self.style = style
+    self.direction = 1 # (1=left to right, -1=right to left)
     
     if url_map is None:
       url_map = {}
@@ -1300,7 +1301,8 @@ class RailroadLayout(object):
       if exx > 0: # Second element onward
         xn = exx + sep # Add space between elements
         c.move(t, xn, exy) # Shift last element forward
-        c.create_line(exx-1, exy, xn, exy, tags=(tag,), width=s.line_width, arrow='last') # Connecting line (NOTE: -1 fudge)
+        arr = 'last' if self.direction == 1 else 'first'
+        c.create_line(exx-1, exy, xn, exy, tags=(tag,), width=s.line_width, arrow=arr) # Connecting line (NOTE: -1 fudge)
         exx = xn + texx # Start at end of this element
       else: # First element
         exx = texx # Start at end of this element
@@ -1467,9 +1469,6 @@ class RailroadLayout(object):
     if isinstance(back, basestring) or back is None:
       back = [back]
 
-    if back[0] == 'line':
-      back = back[1:]
-
     if len(back) == 1:
       if back[0] == ',': # Tight space when loop back is single comma
         vsep = 0
@@ -1481,8 +1480,9 @@ class RailroadLayout(object):
     fx0, fy0, fx1, fy1 = c.bbox(ft)
     fw = fx1 - fx0 # Fwd width
 
-    # Backward section
-    bt, bexx, bexy = self.draw_backwards_line(back)
+    # Backward section, turn direction
+    self.direction = -self.direction
+    bt, bexx, bexy = self.draw_diagram(back)
     bx0, by0, bx1, by1 = c.bbox(bt)
     bw = bx1 - bx0 # Back width
     dy = fy1 - by0 + vsep # Amount to shift backward objects
@@ -1509,9 +1509,11 @@ class RailroadLayout(object):
         dx = (fw - bw) / 2
         c.move(bt, dx, 0) # Shift backward objects to middle of fwd
         bexx = dx + bexx
+        arr1 = 'last' if self.direction == 1 else None
+        arr2 = None if self.direction == 1 or dx < 2*vsep else 'first'
         # Add extension lines to each side of backward
-        c.create_line(0,biny,dx,biny, width=s.line_width, tags=(bt,))
-        c.create_line(bexx,bexy,fx1,bexy, width=s.line_width, tags=(bt,), arrow='first')
+        c.create_line(0,biny,dx,biny, width=s.line_width, tags=(bt,), arrow=arr1)
+        c.create_line(bexx,bexy,fx1,bexy, width=s.line_width, tags=(bt,), arrow=arr2)
         mxx = fexx
       
     elif bw > fw: # Backward is longer
@@ -1535,7 +1537,10 @@ class RailroadLayout(object):
     #x0, y0, x1, y1 = c.bbox(tag) # Bounds for the entire loop
     exit_x = mxx + s.max_radius # Add radius of right turnback to get full width
     c.create_line(mxx,fexy,exit_x,fexy, width=s.line_width, tags=(tag,)) # Feed out line above right turnback
-    
+
+    # End of backward section, turn direction again
+    self.direction = -self.direction
+
     return [tag, exit_x, fexy]
 
   def draw_toploop(self, forward, back):
@@ -1642,9 +1647,10 @@ class RailroadLayout(object):
       m[i] = [t, texx, texy]
       tx0, ty0, tx1, ty1 = c.bbox(t)
       if i == 0:
-        ax = 'last' if dx > x2 else 'none'
-        c.create_line(0,0,dx,0, width=s.line_width, tags=(tag,), arrow=ax)
-        c.create_line(texx,texy,x5+1,texy, width=s.line_width, tags=(tag,))
+        arr1 = 'last' if self.direction == 1 and dx > x2 else None
+        arr2 = None if self.direction == 1 else 'first'
+        c.create_line(0,0,dx,0, width=s.line_width, tags=(tag,), arrow=arr1)
+        c.create_line(texx,texy,x5+1,texy, width=s.line_width, tags=(tag,), arrow=arr2)
         exy = texy
         c.create_arc(-sep,0,sep,sep*2, width=s.line_width, start=90, extent=-90, tags=(tag,), style='arc')
         btm = ty1
@@ -1656,9 +1662,10 @@ class RailroadLayout(object):
         c.move(t, 0, dy)
         texy = texy + dy
         if dx > x2:
-          c.create_line(x2,dy,dx,dy, width=s.line_width, tags=(tag,), arrow='last')
-          ax = 'last' if dx < xc-2 else 'none'
-          c.create_line(texx,texy,x3,texy, width=s.line_width, tags=(tag,), arrow=ax)
+          arr1 = 'last' if self.direction == 1 else None
+          arr2 = 'first' if self.direction == -1 else None
+          c.create_line(x2,dy,dx,dy, width=s.line_width, tags=(tag,), arrow=arr1)
+          c.create_line(texx,texy,x3,texy, width=s.line_width, tags=(tag,), arrow=arr2)
         y1 = dy - 2*sep
         c.create_arc(x1,y1,x1+2*sep,dy, width=s.line_width, start=180, extent=90, style='arc', tags=(tag,))
         y2 = texy - 2*sep
@@ -1686,6 +1693,10 @@ class RailroadLayout(object):
     elif len(spec) == 0:
       return self.draw_bubble(None)
     else:
+      # invert drawing order in case of backloop
+      if self.direction == -1 and spec[0] == 'line':
+        spec = [spec[0]] + list(reversed(spec[1:]))
+
       if spec[0] == 'line':
         return self.draw_line(spec[1:])
       elif spec[0] == 'stack':
