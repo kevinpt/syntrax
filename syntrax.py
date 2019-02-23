@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import re
 import argparse
-from ConfigParser import SafeConfigParser
+from ConfigParser import ConfigParser
 import sys
 import ast
 import os
@@ -21,6 +21,9 @@ try:
   import pangocairo
   use_pygobject = False
 except ImportError:
+  import gi
+  gi.require_version('PangoCairo', '1.0')
+  gi.require_version('Pango', '1.0')
   from gi.repository import Pango as pango
   from gi.repository import PangoCairo as pangocairo
   use_pygobject = True
@@ -224,7 +227,7 @@ def parse_style_config(fname):
   if os.path.exists(fname):
     print('Reading styles from "{}"'.format(fname))
 
-  cp = SafeConfigParser()
+  cp = ConfigParser()
   cp.read(fname)
 
   styles = {}
@@ -516,7 +519,7 @@ def cairo_draw_shape(shape, c, styles):
   elif isinstance(shape, LineShape):
     x0, y0, x1, y1 = shape.points
 
-    if 'arrow' not in shape.options:
+    if 'arrow' not in shape.options or shape.options['arrow'] is None:
       c.move_to(x0,y0)
       c.line_to(x1,y1)
       c.stroke()
@@ -827,13 +830,13 @@ def svg_draw_shape(shape, fh, styles):
 
     attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
 
-    if not shape.options.get('arrow'):
+    if 'arrow' not in shape.options or shape.options['arrow'] is None:
       fh.write(u'<line x1="{}" y1="{}" x2="{}" y2="{}" {} />\n'.format(
         x0,y0,x1,y1, attributes))
     else: # Draw line with arrowhead
       attributes += ' marker-end="url(#arrow)"'
 
-      if shape.options.get('arrow') == 'first':
+      if shape.options['arrow'] == 'first':
         head = x0, y0
         tail = x1, y1
       else: # Last
@@ -1509,22 +1512,25 @@ class RailroadLayout(object):
         dx = (fw - bw) / 2
         c.move(bt, dx, 0) # Shift backward objects to middle of fwd
         bexx = dx + bexx
-        arr1 = 'last' if self.direction == 1 else None
+        arr1 = None if self.direction != 1 or dx < 2*vsep else 'last'
         arr2 = None if self.direction == 1 or dx < 2*vsep else 'first'
         # Add extension lines to each side of backward
         c.create_line(0,biny,dx,biny, width=s.line_width, tags=(bt,), arrow=arr1)
         c.create_line(bexx,bexy,fx1,bexy, width=s.line_width, tags=(bt,), arrow=arr2)
         mxx = fexx
-      
+
     elif bw > fw: # Backward is longer
       dx = (bw - fw) / 2
       c.move(ft, dx, 0) # Shift fwd objects to middle of backward
       fexx = dx + fexx
       # Add extension lines to each side of fwd
-      c.create_line(0,0,dx,fexy, width=s.line_width, tags=(ft,), arrow='last')
+      arr1 = 'first' if self.direction == 1 else None
+      c.create_line(0,0,dx,fexy, width=s.line_width, tags=(ft,), arrow=arr1)
       c.create_line(fexx,fexy,bx1,fexy, width=s.line_width, tags=(ft,))
       mxx = bexx
-    
+    else: # Same length
+      mxx = fexx
+
     c.addtag_withtag(tag, bt) # Retag
     c.addtag_withtag(tag, ft)
     c.dtag(bt, bt) # Drop old tags
@@ -1532,8 +1538,13 @@ class RailroadLayout(object):
     c.move(tag, sep, 0) # Make space for left turnback
     mxx = mxx + sep
     c.create_line(0,0,sep,0, width=s.line_width, tags=(tag,)) # Feed in line meeting above left turnback
-    self.draw_left_turnback(tag, sep, 0, biny, 'up')
-    self.draw_right_turnback(tag, mxx, fexy, bexy, 'down')
+
+    rot_cw = self.direction != 1
+    left_tb_flow = 'up' if rot_cw else 'down'
+    right_tb_flow = 'down' if rot_cw else 'up'
+
+    self.draw_left_turnback(tag, sep, 0, biny, left_tb_flow)
+    self.draw_right_turnback(tag, mxx, fexy, bexy, right_tb_flow)
     #x0, y0, x1, y1 = c.bbox(tag) # Bounds for the entire loop
     exit_x = mxx + s.max_radius # Add radius of right turnback to get full width
     c.create_line(mxx,fexy,exit_x,fexy, width=s.line_width, tags=(tag,)) # Feed out line above right turnback
@@ -1554,13 +1565,15 @@ class RailroadLayout(object):
     if isinstance(back, basestring) or back is None:
       back = [back]
 
-    if back[0] == 'line':
-      back = back[1:]
-
     ft, fexx, fexy = self.draw_diagram(forward)
     fx0, fy0, fx1, fy1 = c.bbox(ft)
     fw = fx1 - fx0
-    bt, bexx, bexy = self.draw_backwards_line(back)
+
+    # Backward section, turn direction
+    #self.direction = -self.direction # FIXME
+    bt, bexx, bexy = self.draw_diagram(back)
+    #bt, bexx, bexy = self.draw_backwards_line(back)
+
     bx0, by0, bx1, by1 = c.bbox(bt)
     bw = bx1 - bx0
     dy = -(by1 - fy0 + vsep)
@@ -1578,8 +1591,10 @@ class RailroadLayout(object):
       c.move(bt, dx, 0) # Shift backward objects to middle of fwd
       bexx = dx + bexx
       # Add extension lines to each side of backward
+      arr2 = None if self.direction == 1 or dx < 2*vsep else 'first'
+
       c.create_line(0,biny,dx,biny, width=s.line_width, tags=(bt,))
-      c.create_line(bexx,bexy,fx1,bexy, width=s.line_width, tags=(bt,), arrow='first')
+      c.create_line(bexx,bexy,fx1,bexy, width=s.line_width, tags=(bt,), arrow=arr2)
       mxx = fexx
     elif bw > fw: # Backward is longer
       dx = (bw - fw) / 2
@@ -1589,6 +1604,8 @@ class RailroadLayout(object):
       c.create_line(0,0,dx,fexy, width=s.line_width, tags=(ft,))
       c.create_line(fexx,fexy,bx1,fexy, width=s.line_width, tags=(ft,))
       mxx = bexx
+    else: # Same length
+      mxx = fexx
 
     c.addtag_withtag(tag, bt) # Retag
     c.addtag_withtag(tag, ft)
@@ -1597,8 +1614,13 @@ class RailroadLayout(object):
     c.move(tag, sep, 0) # Make space for left turnback
     mxx = mxx + sep
     c.create_line(0,0,sep,0, width=s.line_width, tags=(tag,)) # Feed in line meeting below left turnback
-    self.draw_left_turnback(tag, sep, 0, biny, 'down')
-    self.draw_right_turnback(tag, mxx, fexy, bexy, 'up')
+
+    rot_cw = self.direction != 1
+    left_tb_flow = 'up' if rot_cw else 'down'
+    right_tb_flow = 'down' if rot_cw else 'up'
+
+    self.draw_left_turnback(tag, sep, 0, biny, left_tb_flow)
+    self.draw_right_turnback(tag, mxx, fexy, bexy, right_tb_flow)
     x0, y0, x1, y1 = c.bbox(tag)
     c.create_line(mxx,fexy,x1,fexy, width=s.line_width, tags=(tag,)) # Feed out line below right turnback
     
@@ -1612,7 +1634,7 @@ class RailroadLayout(object):
 
     sep = s.v_sep
     vsep = sep / 2
-    
+
     n = len(lx)
     m = {}
     mxw = 0
@@ -1634,7 +1656,7 @@ class RailroadLayout(object):
     x3 = mxw + x2
     x4 = x3 + sep
     x5 = x4 + sep
-    
+
     for i in xrange(len(lx)):
       t, texx, texy = m[i]
       tx0, ty0, tx1, ty1 = c.bbox(t)
@@ -1685,7 +1707,7 @@ class RailroadLayout(object):
   def draw_diagram(self, spec):
     if isinstance(spec, basestring):
       spec = [spec]
-  
+
     if spec is None:
       return self.draw_bubble(spec)
     if len(spec) == 1:
@@ -1713,17 +1735,20 @@ class RailroadLayout(object):
       elif spec[0] == 'or':
         return self.draw_or(spec[1:])
       elif spec[0] == 'opt':
-        args = spec[1:]
-        if len(args) == 1:
-          return self.draw_or([None, args])
-        else: # All args on one line
-          return self.draw_or([None, ['line'] + args])
+        if len(spec) == 2 and is_listy(spec[1]):
+          args = spec[1]
+        else:
+          args = ['line'] + spec[1:]
+
+        return self.draw_or([None, args])
+
       elif spec[0] == 'optx': # opt with pass through on bottom
-        args = spec[1:]
-        if len(args) == 1:
-          return self.draw_or([args, None])
-        else: # All args on one line
-          return self.draw_or([['line'] + args, None])
+        if len(spec) == 2 and is_listy(spec[1]):
+          args = spec[1]
+        else:
+          args = ['line'] + spec[1:]
+
+        return self.draw_or([args, None])
 
       elif spec[0] == 'optloop': # opt with all args in a loop
         args = spec[1:]
@@ -1904,8 +1929,12 @@ def toploop(fwd, back):
 def choice(*args):
   return ['or'] + list(args)
 
+def is_listy(v):
+  return isinstance(v, collections.Sequence) and not isinstance(v, basestring)
+
 def opt(*args):
-  return ['opt'] + list(args)
+  largs = list(args)
+  return ['opt'] + largs
 
 def optx(*args):
   return ['optx'] + list(args)
