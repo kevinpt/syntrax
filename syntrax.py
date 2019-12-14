@@ -151,7 +151,7 @@ class DrawStyle(object):
     if len(node_styles) == 0:
       node_styles = [
         ('bubble', {'shape':'bubble', 'pattern':'^\w', 'font':('Sans', 14, 'bold'), 'fill':(179, 229, 252)}),
-        ('box', {'shape':'box', 'pattern':'^/', 'font':('Times', 14, 'italic'),
+        ('box', {'shape':'box', 'pattern':'^/.', 'font':('Times', 14, 'italic'),
                 'fill':(144, 164, 174), 'text_mod':'lambda txt: txt[1:]'}),
         ('token', {'shape':'bubble', 'pattern':'.', 'font':('Sans', 16, 'bold'), 'fill':(179, 229, 252)}),
       ]
