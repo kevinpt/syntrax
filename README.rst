@@ -40,7 +40,7 @@ isn't currently present in your Python distribution. The source is written in
 Python 2.7 syntax but will convert cleanly to Python 3 when the installer
 passes it through 2to3.
 
-The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax. A `Windows installer <http://www.pygtk.org/downloads.html>`_ is available. For Linux distributions you should install the relevant libraries with your package manager.
+The Pango library is used compute the dimensions of a text layout. There is no standard package to get the Pango Python bindings installed. It is a part of the Gtk+ library which is accessed either through the PyGtk or PyGObject APIs, both of which are supported by Syntrax. You should make sure that one of these libraries is available before installing Syntrax. A `Windows installer <http://www.pygtk.org/downloads.html>`_ is available. For Linux distributions you should install the `relevant libraries <https://pygobject.readthedocs.io/en/latest/getting_started.html#ubuntu-logo-ubuntu-debian-logo-debian>`_ with your package manager.
 
 
 Download
